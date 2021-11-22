@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 namespace TGM3 {
     public class GameRoot : Game {
         public static readonly Vector2 ScreenSize = new Vector2(1366, 768);
-        private GraphicsDeviceManager graphics;
+        private readonly GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
         public GameRoot() {
