@@ -18,10 +18,14 @@ namespace TGM3 {
             for (int y = 0; y < Size.Y; y++) {
                 for (int x = 0; x < Size.X; x++) {
                     int cell = Grid[y, x];
-                    Color color = Color.White;
-                    if (cell == 0) {
-                        color = Color.Gray;
-                    } // else color
+                    Color color;
+                    if (y < Size.Y - visibleRows)
+                        color = new Color(16, 16, 16);
+                    else if (cell == 0) {
+                        color = new Color(64, 64, 64);
+                    } else {
+                        color = Color.White;
+                    }
                     spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), color);
                 }
             }
