@@ -113,7 +113,7 @@ namespace TGM3 {
             // Attempts to rotate the current piece, taking kicks into account
             deltaRot = ClampRotation(deltaRot);
 
-            if (TryMove(deltaX, deltaY, deltaRot)) return true; // Basic movement + rotation
+            if (TryMove(deltaX, deltaY, deltaRot)) return true; // Try basic movement + rotation
 
             if (CurrentPieceType == 0) { // I Tetromino Wall Kick Data
                 if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 1) { // 0>>1
@@ -210,6 +210,31 @@ namespace TGM3 {
             PieceY = 4;
             CurrentPieceRotation = 0;
         }
+        public static void ClearLines() {
+            for(int y = 0; y < Size.Y; y++) {
+                bool lineCleared = true;
+                for (int x = 0; x < Size.X; x++) {
+                    if (Grid[y, x] == 0) {
+                        lineCleared = false;
+                        break;
+                    }
+                }
+                if (lineCleared) {
+                    // TODO increment score?
+                    // TODO particles?
+                    // Shift blocks down
+                    for (int ty = y; ty > 0; ty--) {
+                        for (int tx = 0; tx < Size.X; tx++) {
+                            Grid[ty, tx] = Grid[ty - 1, tx];
+                        }
+                    }
+                    // Clear top row
+                    for (int tx = 0; tx < Size.X; tx++) {
+                        Grid[0, tx] = 0;
+                    }
+                }
+            }
+        }
         public static void LockPiece() {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
@@ -218,6 +243,7 @@ namespace TGM3 {
                     Grid[PieceY + y, PieceX + x] = CurrentPieceType + 1;
                 }
             }
+            ClearLines();
             NewPiece(); // temp? idk xd
         }
         public static void Update() {
@@ -317,12 +343,17 @@ namespace TGM3 {
                 Vector2 HeldPieceOffset = new Vector2(30, 100);
                 DrawPiece(spriteBatch, HeldPieceOffset, HeldPiece, 0);
             }
+            // Draw ghost piece
+            int ghostOffsetY = 0;
+            while (CanMove(0, ghostOffsetY + 1, 0))
+                ghostOffsetY++;
+            DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + (PieceY + ghostOffsetY) * 16), CurrentPieceType, CurrentPieceRotation, 0.5f);
         }
-        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation) {
+        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f) {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (Pieces.data[type, rotation][y * 4 + x] == '1')
-                        spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White);
+                        spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White * alpha);
                 }
             }
         }
