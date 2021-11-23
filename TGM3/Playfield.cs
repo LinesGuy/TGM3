@@ -230,6 +230,7 @@ namespace TGM3 {
                 CurrentDirection = -1;
                 if (CanMove(-1, 0, 0))
                     PieceX--;
+                CurrentDas = 0;
             }
 
             // Basic right
@@ -237,6 +238,7 @@ namespace TGM3 {
                 CurrentDirection = 1;
                 if (CanMove(1, 0, 0))
                     PieceX++;
+                CurrentDas = 0;
             }
             // Release -> reset DAS
             if ((Input.WasKeyJustUp(Keys.Left) && CurrentDirection == -1) || (Input.WasKeyJustUp(Keys.Right) && CurrentDirection == 1)) {
