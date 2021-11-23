@@ -247,10 +247,10 @@ namespace TGM3 {
                     }
                 }
             }
-            if (linesCleared == 1) AddLevels(1);
-            if (linesCleared == 2) AddLevels(2);
-            if (linesCleared == 3) AddLevels(4);
-            if (linesCleared == 4) AddLevels(6);
+            if (linesCleared == 1) AddLevels(1, true);
+            if (linesCleared == 2) AddLevels(2, true);
+            if (linesCleared == 3) AddLevels(4, true);
+            if (linesCleared == 4) AddLevels(6, true);
         }
         public static void LockPiece() {
             for (int y = 0; y < 4; y++) {
@@ -264,9 +264,17 @@ namespace TGM3 {
             ClearLines();
             NewPiece(); // temp? idk xd
         }
-        public static void AddLevels(int levels) {
+        public static void AddLevels(int levels, bool lineClear=false) {
             int previousLevels = Level;
             Level += levels;
+            if (levels % 100 > previousLevels % 100) { // If transitioning level
+                if (lineClear) {
+                    // Level transition
+                } else {
+                    // Set player back to x99 (can only transition during line clear)
+                    Level = (int)Math.Floor(Level / 100d) * 100 - 1;
+                }
+            }
             DoSectionCools(previousLevels);
         }
         public static void DoSectionCools(int previousLevels) {
