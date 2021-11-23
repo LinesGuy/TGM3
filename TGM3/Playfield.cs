@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace TGM3 {
     public static class Playfield {
@@ -13,6 +14,7 @@ namespace TGM3 {
         public static int Gravity = 1024;
         public static int PieceType = 0;
         public static int PieceRotation = 0;
+        private static Random rand = new Random();
         public static int ClampRotation(int deltaRot) {
             if (PieceRotation + deltaRot >= 4)
                 return deltaRot - 4;
@@ -20,6 +22,10 @@ namespace TGM3 {
                 return deltaRot + 4;
             else
                 return deltaRot;
+        }
+        public static void Initialize() {
+            Grid = new int[(int)Size.Y, (int)Size.X];
+            NewPiece();
         }
         public static bool CanMove(int deltaX, int deltaY, int deltaRot) {
             deltaRot = ClampRotation(deltaRot);
@@ -34,7 +40,7 @@ namespace TGM3 {
                         valid = false;
                         break;
                     }
-                    if (Grid[ty, tx] < 0) {
+                    if (Grid[ty, tx] != 0) {
                         valid = false;
                         break;
                     }
@@ -145,8 +151,21 @@ namespace TGM3 {
             }
             return false;
         }
+        public static void NewPiece() {
+            PieceType = rand.Next(0, 7);
+            PieceX = 3;
+            PieceY = 4;
+            PieceRotation = 0;
+        }
         public static void LockPiece() {
-
+            for (int y = 0; y < 4; y++) {
+                for (int x = 0; x < 4; x++) {
+                    if (Pieces.data[PieceType, PieceRotation][y * 4 + x] == '0')
+                        continue;
+                    Grid[PieceY + y, PieceX + x] = PieceType;
+                }
+            }
+            NewPiece(); // temp? idk xd
         }
         public static void Update() {
             // CCW rotation
@@ -160,17 +179,17 @@ namespace TGM3 {
                 Buildup += 65536; // 1G
             // Hard drop
             if (Input.WasKeyJustDown(Keys.Up)) {
-                while (CanMove(0, 1, 0))
-                    PieceY++;
-                // Lock piece
+                while (TryMove(0, 1, 0))
+                    continue;
+                LockPiece();
             }
 
             // Left
-            if (Input.keyboard.IsKeyDown(Keys.Left))
+            if (Input.WasKeyJustDown(Keys.Left))
                 if (CanMove(-1, 0, 0))
                     PieceX--;
             // Right
-            if (Input.keyboard.IsKeyDown(Keys.Right))
+            if (Input.WasKeyJustDown(Keys.Right))
                 if (CanMove(1, 0, 0))
                     PieceX++;
             // Gravity

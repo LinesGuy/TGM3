@@ -18,6 +18,7 @@ namespace TGM3 {
             graphics.PreferredBackBufferWidth = (int)ScreenSize.X;
             graphics.PreferredBackBufferHeight = (int)ScreenSize.Y;
             graphics.ApplyChanges();
+            Playfield.Initialize();
             base.Initialize();
         }
 
