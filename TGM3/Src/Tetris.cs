@@ -36,14 +36,7 @@ namespace TGM3 {
         public static int SectionCoolFrames;
         public static int SectionRegretFrames;
         private static readonly Random rand = new Random();
-        public static int ClampRotation(int deltaRot) {
-            if (CurrentPieceRotation + deltaRot >= 4)
-                return deltaRot - 4;
-            else if (CurrentPieceRotation + deltaRot < 0)
-                return deltaRot + 4;
-            else
-                return deltaRot;
-        }
+        
         public static void AddPiecesToQueue() {
             int[] PiecesToAdd = new int[7] { 0, 1, 2, 3, 4, 5, 6 };
             PiecesToAdd = PiecesToAdd.OrderBy(p => rand.Next()).ToArray(); // Shuffle order
@@ -87,11 +80,11 @@ namespace TGM3 {
             }
         }
         public static bool CanMove(int deltaX, int deltaY, int deltaRot) {
-            deltaRot = ClampRotation(deltaRot);
+            deltaRot = Utils.ClampRotation(CurrentPieceRotation, deltaRot);
             bool valid = true;
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
-                    if (Pieces.data[CurrentPieceType, CurrentPieceRotation + deltaRot][y * 4 + x] == '0')
+                    if (PieceData.data[CurrentPieceType, CurrentPieceRotation + deltaRot][y * 4 + x] == '0')
                         continue;
                     int tx = PieceX + x + deltaX;
                     int ty = PieceY + y + deltaY;
@@ -108,7 +101,7 @@ namespace TGM3 {
             return valid;
         }
         public static bool TryMove(int deltaX, int deltaY, int deltaRot) {
-            deltaRot = ClampRotation(deltaRot);
+            deltaRot = Utils.ClampRotation(CurrentPieceRotation, deltaRot);
             if (CanMove(deltaX, deltaY, deltaRot)) {
                 PieceX += deltaX;
                 PieceY += deltaY;
@@ -119,7 +112,7 @@ namespace TGM3 {
         }
         public static bool TryKickMove(int deltaX, int deltaY, int deltaRot) {
             // Attempts to rotate the current piece, taking kicks into account
-            deltaRot = ClampRotation(deltaRot);
+            deltaRot = Utils.ClampRotation(CurrentPieceRotation, deltaRot);
 
             if (TryMove(deltaX, deltaY, deltaRot)) return true; // Try basic movement + rotation
 
@@ -255,7 +248,7 @@ namespace TGM3 {
         public static void LockPiece() {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
-                    if (Pieces.data[CurrentPieceType, CurrentPieceRotation][y * 4 + x] == '0')
+                    if (PieceData.data[CurrentPieceType, CurrentPieceRotation][y * 4 + x] == '0')
                         continue;
                     Grid[PieceY + y, PieceX + x] = CurrentPieceType + 1;
                 }
@@ -558,7 +551,7 @@ namespace TGM3 {
         public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f) {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
-                    if (Pieces.data[type, rotation][y * 4 + x] == '1')
+                    if (PieceData.data[type, rotation][y * 4 + x] == '1')
                         spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White * alpha);
                 }
             }

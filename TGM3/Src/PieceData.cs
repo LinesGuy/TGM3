@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace TGM3 {
-    public static class Pieces {
+    public static class PieceData {
         public static string[,] data = new string[7, 4] {
             {
                 "0000111100000000",
