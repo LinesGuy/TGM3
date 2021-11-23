@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace TGM3 {
     public static class Playfield {
@@ -25,6 +27,8 @@ namespace TGM3 {
         public static int CurrentDas;
         public static int LockFrames;
         public static int LineClearFrames;
+        public static Queue<int> NextPieces;
+        public static int NumNextPiecesVisible = 4;
         private static Random rand = new Random();
         public static int ClampRotation(int deltaRot) {
             if (PieceRotation + deltaRot >= 4)
@@ -33,6 +37,12 @@ namespace TGM3 {
                 return deltaRot + 4;
             else
                 return deltaRot;
+        }
+        public static void AddPiecesToQueue() {
+            int[] PiecesToAdd = new int[7] { 0, 1, 2, 3, 4, 5, 6 };
+            PiecesToAdd = PiecesToAdd.OrderBy(p => rand.Next()).ToArray(); // Shuffle order
+            foreach (int piece in PiecesToAdd)
+                NextPieces.Enqueue(piece);
         }
         public static void Initialize() {
             Grid = new int[(int)Size.Y, (int)Size.X];
@@ -45,6 +55,10 @@ namespace TGM3 {
             CurrentDas = 0;
             LockFrames = 15;
             LineClearFrames = 6;
+            NextPieces = new Queue<int>();
+            while (NextPieces.Count < NumNextPiecesVisible) {
+                AddPiecesToQueue();
+            }
             NewPiece();
         }
         public static bool CanMove(int deltaX, int deltaY, int deltaRot) {
@@ -172,7 +186,9 @@ namespace TGM3 {
             return false;
         }
         public static void NewPiece() {
-            PieceType = rand.Next(0, 7);
+            PieceType = NextPieces.Dequeue();
+            if (NextPieces.Count <= NumNextPiecesVisible)
+                AddPiecesToQueue();
             PieceX = 3;
             PieceY = 4;
             PieceRotation = 0;
@@ -258,6 +274,7 @@ namespace TGM3 {
         }
         public static void Draw(SpriteBatch spriteBatch) {
             //for (int y = (int)Size.Y - visibleRows; y < Size.Y; y++) {
+            // Draw playfield
             for (int y = 0; y < Size.Y; y++) {
                 for (int x = 0; x < Size.X; x++) {
                     int cell = Grid[y, x];
@@ -272,13 +289,24 @@ namespace TGM3 {
                     spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), color);
                 }
             }
+            // Draw piece
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (Pieces.data[PieceType, PieceRotation][y * 4 + x] == '1')
                         spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + (PieceX + x) * 16, (int)Pos.Y + (PieceY + y) * 16, 16, 16), Color.Red);
                 }
             }
-            //spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + PieceX * 16, (int)Pos.Y + PieceY * 16, 16, 16), Color.Red);
+            // Draw hold pieces
+            Vector2 HoldOffset = new Vector2(300, 100);
+            int HoldDistance = 96;
+            for (int i = 0; i < NumNextPiecesVisible; i++) {
+                for (int y = 0; y < 4; y++) {
+                    for (int x = 0; x < 4; x++) {
+                        if (Pieces.data[NextPieces.ToArray()[i], 0][y * 4 + x] == '1')
+                            spriteBatch.Draw(Art.blockw, new Rectangle((int)HoldOffset.X + x * 16   , (int)HoldOffset.Y + HoldDistance * i + y * 16, 16, 16), Color.Red);
+                    }
+                }
+            }
         }
     }
 }
