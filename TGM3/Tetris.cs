@@ -31,7 +31,7 @@ namespace TGM3 {
         public static bool CanHoldPiece;
         public static Queue<int> NextPieces;
         public static int NumNextPiecesVisible = 4;
-        private static Random rand = new Random();
+        private static readonly Random rand = new Random();
         public static int ClampRotation(int deltaRot) {
             if (CurrentPieceRotation + deltaRot >= 4)
                 return deltaRot - 4;
@@ -297,13 +297,11 @@ namespace TGM3 {
             for (int y = (int)Size.Y - visibleRows; y < Size.Y; y++) {
                 for (int x = 0; x < Size.X; x++) {
                     int cell = Grid[y, x];
-                    Color color;
                     if (cell == 0) { // Draw grid
                         spriteBatch.Draw(Art.Grid, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), Color.White);
                     } else { // Draw piece
                         spriteBatch.Draw(GetTextureFromPiece(cell - 1), new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), Color.White);
                     }
-                    
                 }
             }
             // Draw piece
