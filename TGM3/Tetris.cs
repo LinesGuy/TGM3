@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace TGM3 {
@@ -29,6 +28,7 @@ namespace TGM3 {
         public static int LineClearFrames;
         public static int HeldPiece;
         public static bool CanHoldPiece;
+        public static int SpeedLevel;
         public static Queue<int> NextPieces;
         public static int NumNextPiecesVisible = 4;
         private static readonly Random rand = new Random();
@@ -57,6 +57,7 @@ namespace TGM3 {
             CurrentDas = 0;
             LockFrames = 15;
             LineClearFrames = 6;
+            SpeedLevel = 0;
             NextPieces = new Queue<int>();
             while (NextPieces.Count < NumNextPiecesVisible) {
                 AddPiecesToQueue();
@@ -115,89 +116,92 @@ namespace TGM3 {
 
             if (TryMove(deltaX, deltaY, deltaRot)) return true; // Try basic movement + rotation
 
+            // NOTE: The wall kick data on the tetris wiki uses positive Y = upwards, my program uses positive Y = downwards
+            // This means all the y-offset values will be negative from the wiki
+
             if (CurrentPieceType == 0) { // I Tetromino Wall Kick Data
                 if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 1) { // 0>>1
                     if (TryMove(-2, 0, deltaRot)) return true;
                     if (TryMove(1, 0, deltaRot)) return true;
-                    if (TryMove(-2, -1, deltaRot)) return true;
-                    if (TryMove(1, 2, deltaRot)) return true;
+                    if (TryMove(-2, 1, deltaRot)) return true;
+                    if (TryMove(1, -2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 1 && CurrentPieceRotation + deltaRot == 0) { // 1>>0
                     if (TryMove(2, 0, deltaRot)) return true;
                     if (TryMove(-1, 0, deltaRot)) return true;
-                    if (TryMove(2, 1, deltaRot)) return true;
-                    if (TryMove(-1, -2, deltaRot)) return true;
+                    if (TryMove(2, -1, deltaRot)) return true;
+                    if (TryMove(-1, 2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 1 && CurrentPieceRotation + deltaRot == 2) { // 1>>2
                     if (TryMove(-1, 0, deltaRot)) return true;
                     if (TryMove(2, 0, deltaRot)) return true;
-                    if (TryMove(-1, 2, deltaRot)) return true;
-                    if (TryMove(2, -1, deltaRot)) return true;
+                    if (TryMove(-1, -2, deltaRot)) return true;
+                    if (TryMove(2, 1, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 1) { // 2>>1
                     if (TryMove(-1, 0, deltaRot)) return true;
                     if (TryMove(-2, 0, deltaRot)) return true;
-                    if (TryMove(1, -2, deltaRot)) return true;
-                    if (TryMove(-2, 1, deltaRot)) return true;
+                    if (TryMove(1, 2, deltaRot)) return true;
+                    if (TryMove(-2, -1, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 3) { // 2>>3
                     if (TryMove(2, 0, deltaRot)) return true;
                     if (TryMove(-1, 0, deltaRot)) return true;
-                    if (TryMove(2, 1, deltaRot)) return true;
-                    if (TryMove(-1, -2, deltaRot)) return true;
+                    if (TryMove(2, -1, deltaRot)) return true;
+                    if (TryMove(-1, 2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 2) { // 3>>2
                     if (TryMove(-2, 0, deltaRot)) return true;
                     if (TryMove(1, 0, deltaRot)) return true;
-                    if (TryMove(-2, -1, deltaRot)) return true;
-                    if (TryMove(1, 2, deltaRot)) return true;
+                    if (TryMove(-2, 1, deltaRot)) return true;
+                    if (TryMove(1, -2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 0) { // 3>>0
                     if (TryMove(1, 0, deltaRot)) return true;
                     if (TryMove(-2, 0, deltaRot)) return true;
-                    if (TryMove(1, -2, deltaRot)) return true;
-                    if (TryMove(-2, 1, deltaRot)) return true;
+                    if (TryMove(1, 2, deltaRot)) return true;
+                    if (TryMove(-2, -1, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 3) { // 0>>3
                     if (TryMove(-1, 0, deltaRot)) return true;
                     if (TryMove(2, 0, deltaRot)) return true;
-                    if (TryMove(-1, 2, deltaRot)) return true;
-                    if (TryMove(2, -1, deltaRot)) return true;
+                    if (TryMove(-1, -2, deltaRot)) return true;
+                    if (TryMove(2, 1, deltaRot)) return true;
                 }
             } else { // J, L, T, S, Z Tetromino Wall Kick Data
                 if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 1) { // 0>>1
                     if (TryMove(-1, 0, deltaRot)) return true;
-                    if (TryMove(-1, 1, deltaRot)) return true;
-                    if (TryMove(0, -2, deltaRot)) return true;
-                    if (TryMove(-1, -2, deltaRot)) return true;
+                    if (TryMove(-1, -1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(-1, 2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 1 && CurrentPieceRotation + deltaRot == 0) { // 1>>0
                     if (TryMove(1, 0, deltaRot)) return true;
-                    if (TryMove(1, -1, deltaRot)) return true;
-                    if (TryMove(0, 2, deltaRot)) return true;
-                    if (TryMove(1, 2, deltaRot)) return true;
+                    if (TryMove(1, 1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(1, -2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 1 && CurrentPieceRotation + deltaRot == 2) { // 1>>2
+                    if (TryMove(1, 0, deltaRot)) return true;
+                    if (TryMove(1, 1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(1, -2, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 1) { // 2>>1
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                    if (TryMove(-1, -1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(-1, 2, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 3) { // 2>>3
                     if (TryMove(1, 0, deltaRot)) return true;
                     if (TryMove(1, -1, deltaRot)) return true;
                     if (TryMove(0, 2, deltaRot)) return true;
                     if (TryMove(1, 2, deltaRot)) return true;
-                } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 1) { // 2>>1
+                } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 2) { // 3>>2
                     if (TryMove(-1, 0, deltaRot)) return true;
                     if (TryMove(-1, 1, deltaRot)) return true;
                     if (TryMove(0, -2, deltaRot)) return true;
                     if (TryMove(-1, -2, deltaRot)) return true;
-                } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 3) { // 2>>3
-                    if (TryMove(1, 0, deltaRot)) return true;
-                    if (TryMove(1, 1, deltaRot)) return true;
-                    if (TryMove(0, -2, deltaRot)) return true;
-                    if (TryMove(1, -2, deltaRot)) return true;
-                } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 2) { // 3>>2
-                    if (TryMove(-1, 0, deltaRot)) return true;
-                    if (TryMove(-1, -1, deltaRot)) return true;
-                    if (TryMove(0, 2, deltaRot)) return true;
-                    if (TryMove(-1, 2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 0) { // 3>>0
                     if (TryMove(-1, 0, deltaRot)) return true;
-                    if (TryMove(-1, -1, deltaRot)) return true;
-                    if (TryMove(0, 2, deltaRot)) return true;
-                    if (TryMove(-1, 2, deltaRot)) return true;
+                    if (TryMove(-1, 1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(-1, -2, deltaRot)) return true;
                 } else if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 3) { // 0>>3
                     if (TryMove(1, 0, deltaRot)) return true;
-                    if (TryMove(1, 1, deltaRot)) return true;
-                    if (TryMove(0, -2, deltaRot)) return true;
-                    if (TryMove(1, -2, deltaRot)) return true;
+                    if (TryMove(1, -1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(1, 2, deltaRot)) return true;
                 }
             }
             return false;
@@ -211,7 +215,7 @@ namespace TGM3 {
             CurrentPieceRotation = 0;
         }
         public static void ClearLines() {
-            for(int y = 0; y < Size.Y; y++) {
+            for (int y = 0; y < Size.Y; y++) {
                 bool lineCleared = true;
                 for (int x = 0; x < Size.X; x++) {
                     if (Grid[y, x] == 0) {
@@ -247,7 +251,7 @@ namespace TGM3 {
             NewPiece(); // temp? idk xd
         }
         public static void Update() {
-            
+            UpdateSpeedLevel(0); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
             #region Rotation input
             // CCW rotation
             if (Input.WasKeyJustDown(Keys.X))
@@ -310,13 +314,102 @@ namespace TGM3 {
             #endregion
             #region Gravity
             // Gravity
-            Buildup += Gravity;
             while (Buildup >= 65536) {
                 Buildup -= 65536;
                 if (CanMove(0, 1, 0))
                     PieceY++;
             }
             #endregion
+        }
+        public static void UpdateSpeedLevel(int speedLevel) {
+            SpeedLevel = speedLevel;
+            // Gravity
+            if (SpeedLevel >= 500) Gravity = 1310720; // 20G
+            else if (SpeedLevel >= 450) Gravity = 196608; // 3G
+            else if (SpeedLevel >= 400) Gravity = 327680; // 5G
+            else if (SpeedLevel >= 420) Gravity = 262144; // 4G
+            else if (SpeedLevel >= 360) Gravity = 262144; // 4G
+            else if (SpeedLevel >= 330) Gravity = 196608; // 3G
+            else if (SpeedLevel >= 300) Gravity = 131072; // 2G
+            else if (SpeedLevel >= 251) Gravity = 65536; // 1G
+            else if (SpeedLevel >= 247) Gravity = 57344;
+            else if (SpeedLevel >= 243) Gravity = 49152;
+            else if (SpeedLevel >= 239) Gravity = 40960;
+            else if (SpeedLevel >= 236) Gravity = 32768;
+            else if (SpeedLevel >= 233) Gravity = 24576;
+            else if (SpeedLevel >= 230) Gravity = 16384;
+            else if (SpeedLevel >= 220) Gravity = 8192;
+            else if (SpeedLevel >= 200) Gravity = 1024;
+            else if (SpeedLevel >= 170) Gravity = 36864;
+            else if (SpeedLevel >= 160) Gravity = 32768;
+            else if (SpeedLevel >= 140) Gravity = 28672;
+            else if (SpeedLevel >= 120) Gravity = 24576;
+            else if (SpeedLevel >= 100) Gravity = 20480;
+            else if (SpeedLevel >= 90) Gravity = 16384;
+            else if (SpeedLevel >= 80) Gravity = 12288;
+            else if (SpeedLevel >= 70) Gravity = 8192;
+            else if (SpeedLevel >= 60) Gravity = 4096;
+            else if (SpeedLevel >= 50) Gravity = 3072;
+            else if (SpeedLevel >= 40) Gravity = 2560;
+            else if (SpeedLevel >= 35) Gravity = 2048;
+            else if (SpeedLevel >= 30) Gravity = 1536;
+            else Gravity = 1024; // if (SpeedLevel >= 0)
+
+            if (speedLevel >= 1200) {
+                AreFrames = 4;
+                LineAreFrames = 4;
+                DasFrames = 6;
+                LockFrames = 15;
+                LineClearFrames = 6;
+            } else if (speedLevel >= 1100) {
+                AreFrames = 5;
+                LineAreFrames = 5;
+                DasFrames = 6;
+                LockFrames = 15;
+                LineClearFrames = 6;
+            } else if (speedLevel >= 1000) {
+                AreFrames = 6;
+                LineAreFrames = 6;
+                DasFrames = 6;
+                LockFrames = 17;
+                LineClearFrames = 6;
+            } else if (speedLevel >= 900) {
+                AreFrames = 12;
+                LineAreFrames = 6;
+                DasFrames = 6;
+                LockFrames = 17;
+                LineClearFrames = 6;
+            } else if (speedLevel >= 800) {
+                AreFrames = 12;
+                LineAreFrames = 6;
+                DasFrames = 8;
+                LockFrames = 30;
+                LineClearFrames = 6;
+            } else if (speedLevel >= 700) {
+                AreFrames = 16;
+                LineAreFrames = 12;
+                DasFrames = 8;
+                LockFrames = 30;
+                LineClearFrames = 12;
+            } else if (speedLevel >= 600) {
+                AreFrames = 25;
+                LineAreFrames = 16;
+                DasFrames = 8;
+                LockFrames = 30;
+                LineClearFrames = 16;
+            } else if (speedLevel >= 500) {
+                AreFrames = 25;
+                LineAreFrames = 25;
+                DasFrames = 8;
+                LockFrames = 30;
+                LineClearFrames = 16;
+            } else { // if (speedLevel >= 0) {
+                AreFrames = 25;
+                LineAreFrames = 25;
+                DasFrames = 14;
+                LockFrames = 30;
+                LineClearFrames = 40;
+            }
         }
         public static void Draw(SpriteBatch spriteBatch) {
             // Draw playfield
