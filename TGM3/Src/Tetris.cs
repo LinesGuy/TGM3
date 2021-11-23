@@ -36,7 +36,6 @@ namespace TGM3 {
         public static int SectionCoolFrames;
         public static int SectionRegretFrames;
         private static readonly Random rand = new Random();
-        
         public static void AddPiecesToQueue() {
             int[] PiecesToAdd = new int[7] { 0, 1, 2, 3, 4, 5, 6 };
             PiecesToAdd = PiecesToAdd.OrderBy(p => rand.Next()).ToArray(); // Shuffle order
@@ -257,7 +256,7 @@ namespace TGM3 {
             ClearLines();
             NewPiece(); // temp? idk xd
         }
-        public static void AddLevels(int levels, bool lineClear=false) {
+        public static void AddLevels(int levels, bool lineClear = false) {
             int previousLevels = Level;
             Level += levels;
             if (levels % 100 > previousLevels % 100) { // If transitioning level
@@ -418,6 +417,7 @@ namespace TGM3 {
             #endregion
             #region Gravity
             // Gravity
+            Buildup += Gravity;
             while (Buildup >= 65536) {
                 Buildup -= 65536;
                 if (CanMove(0, 1, 0))
