@@ -313,22 +313,23 @@ namespace TGM3 {
                 }
             }
             // Draw piece
-            for (int y = 0; y < 4; y++) {
-                for (int x = 0; x < 4; x++) {
-                    if (Pieces.data[CurrentPieceType, CurrentPieceRotation][y * 4 + x] == '1')
-                        spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + (PieceX + x) * 16, (int)Pos.Y + (PieceY + y) * 16, 16, 16), GetColorFromPiece(CurrentPieceType));
-                }
-            }
+            DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
             // Draw next pieces
             Vector2 NextPiecesOffset = new Vector2(300, 100);
             int NextPiecesSeparation = 96;
             for (int i = 0; i < NumNextPiecesVisible; i++) {
-                for (int y = 0; y < 4; y++) {
-                    for (int x = 0; x < 4; x++) {
-                        int Piece = NextPieces.ToArray()[i];
-                        if (Pieces.data[Piece, 0][y * 4 + x] == '1')
-                            spriteBatch.Draw(Art.blockw, new Rectangle((int)NextPiecesOffset.X + x * 16   , (int)NextPiecesOffset.Y + NextPiecesSeparation * i + y * 16, 16, 16), GetColorFromPiece(Piece));
-                    }
+                DrawPiece(spriteBatch, NextPiecesOffset + new Vector2(0, i * NextPiecesSeparation), NextPieces.ToArray()[i], 0);
+            }
+            // Draw held piece (if any)
+            if (HeldPiece != -1) {
+
+            }
+        }
+        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation) {
+            for (int y = 0; y < 4; y++) {
+                for (int x = 0; x < 4; x++) {
+                    if (Pieces.data[type, rotation][y * 4 + x] == '1')
+                        spriteBatch.Draw(Art.blockw, new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), GetColorFromPiece(type));
                 }
             }
         }
