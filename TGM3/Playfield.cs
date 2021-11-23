@@ -296,14 +296,14 @@ namespace TGM3 {
                         spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + (PieceX + x) * 16, (int)Pos.Y + (PieceY + y) * 16, 16, 16), Color.Red);
                 }
             }
-            // Draw hold pieces
-            Vector2 HoldOffset = new Vector2(300, 100);
-            int HoldDistance = 96;
+            // Draw next pieces
+            Vector2 NextPiecesOffset = new Vector2(300, 100);
+            int NextPiecesSeparation = 96;
             for (int i = 0; i < NumNextPiecesVisible; i++) {
                 for (int y = 0; y < 4; y++) {
                     for (int x = 0; x < 4; x++) {
                         if (Pieces.data[NextPieces.ToArray()[i], 0][y * 4 + x] == '1')
-                            spriteBatch.Draw(Art.blockw, new Rectangle((int)HoldOffset.X + x * 16   , (int)HoldOffset.Y + HoldDistance * i + y * 16, 16, 16), Color.Red);
+                            spriteBatch.Draw(Art.blockw, new Rectangle((int)NextPiecesOffset.X + x * 16   , (int)NextPiecesOffset.Y + NextPiecesSeparation * i + y * 16, 16, 16), Color.Red);
                     }
                 }
             }
