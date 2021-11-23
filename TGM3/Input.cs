@@ -16,7 +16,7 @@ namespace TGM3 {
             return keyboard.IsKeyDown(key) && !lastKeyboard.IsKeyDown(key);
         }
         public static bool WasKeyJustUp(Keys key) {
-            return keyboard.IsKeyDown(key) && !lastKeyboard.IsKeyDown(key);
+            return keyboard.IsKeyUp(key) && !lastKeyboard.IsKeyUp(key);
         }
         public static bool WasLeftButtonJustDown() {
             return mouse.LeftButton == ButtonState.Pressed && (lastMouse.LeftButton == ButtonState.Released);
