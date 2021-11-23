@@ -531,11 +531,15 @@ namespace TGM3 {
             }
             // Draw piece
             DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
-            // Draw next pieces
-            Vector2 NextPiecesOffset = new Vector2(300, 100);
-            int NextPiecesSeparation = 96;
-            for (int i = 0; i < NumNextPiecesVisible; i++) {
-                DrawPiece(spriteBatch, NextPiecesOffset + new Vector2(0, i * NextPiecesSeparation), NextPieces.ToArray()[i], 0);
+            // Draw next pieces (if any)
+            if (NumNextPiecesVisible > 0) {
+                Vector2 NextPiecesOffset = Pos + new Vector2(48, -16);
+                // Draw first piece (full scale)
+                DrawPiece(spriteBatch, NextPiecesOffset, NextPieces.ToArray()[0], 0);
+                // Draw any extra pieces (half scale)
+                for (int i = 1; i < NumNextPiecesVisible; i++) {
+                    DrawPiece(spriteBatch, NextPiecesOffset + new Vector2(32 + i * 48, 16), NextPieces.ToArray()[i], 0, drawScale: 0.5f);
+                }
             }
             // Draw held piece (if any)
             if (HeldPiece != -1) {
@@ -548,11 +552,12 @@ namespace TGM3 {
                 ghostOffsetY++;
             DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + (PieceY + ghostOffsetY) * 16), CurrentPieceType, CurrentPieceRotation, 0.5f);
         }
-        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f) {
+        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f, float drawScale=1f) {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (PieceData.data[type, rotation][y * 4 + x] == '1')
-                        spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White * alpha);
+                        //spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White * alpha);
+                        spriteBatch.Draw(GetTextureFromPiece(type), new Vector2(pos.X + x * 16 * drawScale, pos.Y + y * 16 * drawScale), null, Color.White * alpha, 0f, Vector2.Zero, drawScale, 0, 0);
                 }
             }
         }
