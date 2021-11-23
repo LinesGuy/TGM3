@@ -72,7 +72,7 @@ namespace TGM3 {
             } else {
                 int tempPiece = CurrentPieceType;
                 CurrentPieceType = HeldPiece;
-                HeldPiece = CurrentPieceType;
+                HeldPiece = tempPiece;
                 PieceX = 3;
                 PieceY = 4;
                 CurrentPieceRotation = 0;
@@ -322,7 +322,8 @@ namespace TGM3 {
             }
             // Draw held piece (if any)
             if (HeldPiece != -1) {
-
+                Vector2 HeldPieceOffset = new Vector2(30, 100);
+                DrawPiece(spriteBatch, HeldPieceOffset, HeldPiece, 0);
             }
         }
         public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation) {
