@@ -16,7 +16,7 @@ namespace TGM3 {
         public static Texture2D blockZ;
         public static Texture2D Grid;
         public static void Load(ContentManager content) {
-            block = content.Load<Texture2D>("B  lock");
+            block = content.Load<Texture2D>("Block");
             blockI = content.Load<Texture2D>("BlockI");
             blockJ = content.Load<Texture2D>("BlockJ");
             blockL = content.Load<Texture2D>("BlockL");
