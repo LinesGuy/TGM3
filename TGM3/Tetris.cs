@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace TGM3 {
@@ -29,8 +30,11 @@ namespace TGM3 {
         public static int HeldPiece;
         public static bool CanHoldPiece;
         public static int SpeedLevel;
+        public static int Level;
         public static Queue<int> NextPieces;
-        public static int NumNextPiecesVisible = 4;
+        public static int NumNextPiecesVisible = 3;
+        public static int SectionCoolFrames;
+        public static int SectionRegretFrames;
         private static readonly Random rand = new Random();
         public static int ClampRotation(int deltaRot) {
             if (CurrentPieceRotation + deltaRot >= 4)
@@ -58,11 +62,14 @@ namespace TGM3 {
             LockFrames = 15;
             LineClearFrames = 6;
             SpeedLevel = 0;
+            Level = 0;
             NextPieces = new Queue<int>();
             while (NextPieces.Count < NumNextPiecesVisible) {
                 AddPiecesToQueue();
             }
             HeldPiece = -1;
+            SectionCoolFrames = 0;
+            SectionRegretFrames = 0;
             CanHoldPiece = true;
             NewPiece();
         }
@@ -203,6 +210,7 @@ namespace TGM3 {
                     if (TryMove(0, 2, deltaRot)) return true;
                     if (TryMove(1, 2, deltaRot)) return true;
                 }
+                // TODO 180 degree kick code?
             }
             return false;
         }
@@ -215,6 +223,7 @@ namespace TGM3 {
             CurrentPieceRotation = 0;
         }
         public static void ClearLines() {
+            int linesCleared = 0;
             for (int y = 0; y < Size.Y; y++) {
                 bool lineCleared = true;
                 for (int x = 0; x < Size.X; x++) {
@@ -224,7 +233,7 @@ namespace TGM3 {
                     }
                 }
                 if (lineCleared) {
-                    // TODO increment score?
+                    linesCleared++;
                     // TODO particles?
                     // Shift blocks down
                     for (int ty = y; ty > 0; ty--) {
@@ -238,6 +247,10 @@ namespace TGM3 {
                     }
                 }
             }
+            if (linesCleared == 1) AddLevels(1);
+            if (linesCleared == 2) AddLevels(2);
+            if (linesCleared == 3) AddLevels(4);
+            if (linesCleared == 4) AddLevels(6);
         }
         public static void LockPiece() {
             for (int y = 0; y < 4; y++) {
@@ -247,8 +260,98 @@ namespace TGM3 {
                     Grid[PieceY + y, PieceX + x] = CurrentPieceType + 1;
                 }
             }
+            AddLevels(1);
             ClearLines();
             NewPiece(); // temp? idk xd
+        }
+        public static void AddLevels(int levels) {
+            int previousLevels = Level;
+            Level += levels;
+            DoSectionCools(previousLevels);
+        }
+        public static void DoSectionCools(int previousLevels) {
+            // previousLevels is required so if the player jumps from, say, level 69 to level 71, the level 70 check is still called
+            // Note that all section COOLs are COOLs but not all COOLs are section COOLs
+            Debug.WriteLine(Level);
+            Debug.WriteLine(SectionCoolFrames);
+            // Section COOLs
+            if (previousLevels < 70 && Level >= 70) { // 000-070
+                if (SectionCoolFrames <= 3120) { Debug.WriteLine("COOL!!"); } // 52:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 170 && Level >= 170) { // 100-170
+                if (SectionCoolFrames <= 3120) { } // 52:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 270 && Level >= 270) { // 200-270
+                if (SectionCoolFrames <= 2940) { } // 49:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 370 && Level >= 370) { // 300-370
+                if (SectionCoolFrames <= 2700) { } // 45:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 470 && Level >= 470) { // 400-470
+                if (SectionCoolFrames <= 2700) { } // 45:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 570 && Level >= 570) { // 500-570
+                if (SectionCoolFrames <= 2520) { } // 42:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 670 && Level >= 670) { // 600-670
+                if (SectionCoolFrames <= 2520) { } // 42:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 770 && Level >= 770) { // 700-770
+                if (SectionCoolFrames <= 2280) { } // 38:00
+                SectionCoolFrames = 0;
+            }
+            if (previousLevels < 870 && Level >= 870) { // 800-870
+                if (SectionCoolFrames <= 2280) { } // 38:00
+                SectionCoolFrames = 0;
+            }
+            // Section REGRETs
+            if (previousLevels < 099 && Level >= 099) { // 000-099
+                if (SectionRegretFrames <= 5400) { } // 1:30:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 199 && Level >= 199) { // 100-199
+                if (SectionRegretFrames <= 4500) { } // 1:15:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 299 && Level >= 299) { // 200-299
+                if (SectionRegretFrames <= 4500) { } // 1:15:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 399 && Level >= 399) { // 300-399
+                if (SectionRegretFrames <= 4080) { } // 1:08:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 499 && Level >= 499) { // 400-499
+                if (SectionRegretFrames <= 3600) { } // 1:00:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 599 && Level >= 599) { // 500-599
+                if (SectionRegretFrames <= 3600) { } // 1:00:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 699 && Level >= 699) { // 600-699
+                if (SectionRegretFrames <= 3000) { } // 50:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 799 && Level >= 799) { // 700-799
+                if (SectionRegretFrames <= 3000) { } // 50:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 899 && Level >= 899) { // 800-899
+                if (SectionRegretFrames <= 3000) { } // 50:00
+                SectionRegretFrames = 0;
+            }
+            if (previousLevels < 899 && Level >= 899) { // 900-999
+                if (SectionRegretFrames <= 3000) { } // 50:00
+                SectionRegretFrames = 0;
+            }
         }
         public static void Update() {
             UpdateSpeedLevel(0); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
@@ -320,6 +423,8 @@ namespace TGM3 {
                     PieceY++;
             }
             #endregion
+            SectionCoolFrames++;
+            SectionRegretFrames++;
         }
         public static void UpdateSpeedLevel(int speedLevel) {
             SpeedLevel = speedLevel;
