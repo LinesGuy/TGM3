@@ -12,7 +12,7 @@ namespace TGM3 {
         public static int PieceX = 0, PieceY = 0;
         public static int Buildup = 0;
         public static int Gravity = 1024;
-        public static int PieceType = 0;
+        public static int PieceType;
         public static int PieceRotation = 0;
         private static Random rand = new Random();
         public static int ClampRotation(int deltaRot) {
@@ -162,7 +162,7 @@ namespace TGM3 {
                 for (int x = 0; x < 4; x++) {
                     if (Pieces.data[PieceType, PieceRotation][y * 4 + x] == '0')
                         continue;
-                    Grid[PieceY + y, PieceX + x] = PieceType;
+                    Grid[PieceY + y, PieceX + x] = PieceType + 1;
                 }
             }
             NewPiece(); // temp? idk xd
