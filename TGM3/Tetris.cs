@@ -281,9 +281,6 @@ namespace TGM3 {
                 }
                 CurrentDas++;
             }
-
-            
-            
             #endregion
             #region Gravity
             // Gravity
@@ -296,20 +293,17 @@ namespace TGM3 {
             #endregion
         }
         public static void Draw(SpriteBatch spriteBatch) {
-            //for (int y = (int)Size.Y - visibleRows; y < Size.Y; y++) {
             // Draw playfield
-            for (int y = 0; y < Size.Y; y++) {
+            for (int y = (int)Size.Y - visibleRows; y < Size.Y; y++) {
                 for (int x = 0; x < Size.X; x++) {
                     int cell = Grid[y, x];
                     Color color;
-                    if (y < Size.Y - visibleRows)
-                        color = new Color(16, 16, 16);
-                    else if (cell == 0) {
-                        color = new Color(64, 64, 64);
-                    } else {
-                        color = Color.White;
+                    if (cell == 0) { // Draw grid
+                        spriteBatch.Draw(Art.Grid, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), Color.White);
+                    } else { // Draw piece
+                        spriteBatch.Draw(GetTextureFromPiece(cell - 1), new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), Color.White);
                     }
-                    spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), GetColorFromPiece(Grid[y, x] - 1));
+                    
                 }
             }
             // Draw piece
@@ -330,19 +324,19 @@ namespace TGM3 {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (Pieces.data[type, rotation][y * 4 + x] == '1')
-                        spriteBatch.Draw(Art.blockw, new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), GetColorFromPiece(type));
+                        spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White);
                 }
             }
         }
-        public static Color GetColorFromPiece(int piece) {
-            if (piece == 0) return Color.Cyan;
-            if (piece == 1) return Color.Blue;
-            if (piece == 2) return Color.Orange;
-            if (piece == 3) return Color.Yellow;
-            if (piece == 4) return Color.Green;
-            if (piece == 5) return Color.Purple;
-            if (piece == 6) return Color.Red;
-            else return new Color(64, 64, 64);
+        public static Texture2D GetTextureFromPiece(int piece) {
+            if (piece == 0) return Art.BlockI;
+            if (piece == 1) return Art.BlockJ;
+            if (piece == 2) return Art.BlockL;
+            if (piece == 3) return Art.BlockO;
+            if (piece == 4) return Art.BlockS;
+            if (piece == 5) return Art.BlockT;
+            if (piece == 6) return Art.BlockZ;
+            else return Art.Block;
         }
     }
 }
