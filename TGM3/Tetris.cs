@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 
 namespace TGM3 {
-    public static class Playfield {
+    public static class Tetris {
         public static Vector2 Pos = new Vector2(100, 100);
         public static Vector2 Size = new Vector2(10, 24);
         public static int visibleRows = 20;

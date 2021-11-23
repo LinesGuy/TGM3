@@ -18,7 +18,7 @@ namespace TGM3 {
             graphics.PreferredBackBufferWidth = (int)ScreenSize.X;
             graphics.PreferredBackBufferHeight = (int)ScreenSize.Y;
             graphics.ApplyChanges();
-            Playfield.Initialize();
+            Tetris.Initialize();
             base.Initialize();
         }
 
@@ -30,14 +30,14 @@ namespace TGM3 {
         protected override void Update(GameTime gameTime) {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
             Input.Update();
-            Playfield.Update();
+            Tetris.Update();
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            Playfield.Draw(spriteBatch);
+            Tetris.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }
