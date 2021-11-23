@@ -286,14 +286,14 @@ namespace TGM3 {
                     } else {
                         color = Color.White;
                     }
-                    spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), color);
+                    spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + x * 16, (int)Pos.Y + y * 16, 16, 16), GetColorFromPiece(Grid[y, x] - 1));
                 }
             }
             // Draw piece
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (Pieces.data[PieceType, PieceRotation][y * 4 + x] == '1')
-                        spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + (PieceX + x) * 16, (int)Pos.Y + (PieceY + y) * 16, 16, 16), Color.Red);
+                        spriteBatch.Draw(Art.blockw, new Rectangle((int)Pos.X + (PieceX + x) * 16, (int)Pos.Y + (PieceY + y) * 16, 16, 16), GetColorFromPiece(PieceType));
                 }
             }
             // Draw next pieces
@@ -302,11 +302,22 @@ namespace TGM3 {
             for (int i = 0; i < NumNextPiecesVisible; i++) {
                 for (int y = 0; y < 4; y++) {
                     for (int x = 0; x < 4; x++) {
-                        if (Pieces.data[NextPieces.ToArray()[i], 0][y * 4 + x] == '1')
-                            spriteBatch.Draw(Art.blockw, new Rectangle((int)NextPiecesOffset.X + x * 16   , (int)NextPiecesOffset.Y + NextPiecesSeparation * i + y * 16, 16, 16), Color.Red);
+                        int Piece = NextPieces.ToArray()[i];
+                        if (Pieces.data[Piece, 0][y * 4 + x] == '1')
+                            spriteBatch.Draw(Art.blockw, new Rectangle((int)NextPiecesOffset.X + x * 16   , (int)NextPiecesOffset.Y + NextPiecesSeparation * i + y * 16, 16, 16), GetColorFromPiece(Piece));
                     }
                 }
             }
+        }
+        public static Color GetColorFromPiece(int piece) {
+            if (piece == 0) return Color.Cyan;
+            if (piece == 1) return Color.Blue;
+            if (piece == 2) return Color.Orange;
+            if (piece == 3) return Color.Yellow;
+            if (piece == 4) return Color.Green;
+            if (piece == 5) return Color.Purple;
+            if (piece == 6) return Color.Red;
+            else return new Color(64, 64, 64);
         }
     }
 }

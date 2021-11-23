@@ -35,7 +35,7 @@ namespace TGM3 {
         }
 
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.DarkBlue);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
             Playfield.Draw(spriteBatch);
             spriteBatch.End();
