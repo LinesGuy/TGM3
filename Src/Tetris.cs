@@ -35,6 +35,7 @@ namespace TGM3 {
         public static int NumNextPiecesVisible = 3;
         public static int SectionCoolFrames;
         public static int SectionRegretFrames;
+        public static int RemainingLockDelayFrames;
         private static readonly Random rand = new Random();
         public static void AddPiecesToQueue() {
             int[] PiecesToAdd = new int[7] { 0, 1, 2, 3, 4, 5, 6 };
@@ -42,6 +43,7 @@ namespace TGM3 {
             foreach (int piece in PiecesToAdd)
                 NextPieces.Enqueue(piece);
         }
+        public static bool IsDelayed { get { return RemainingLockDelayFrames > 0; } } 
         public static void Initialize() {
             Grid = new int[(int)Size.Y, (int)Size.X];
             CurrentDirection = 0;
@@ -214,7 +216,7 @@ namespace TGM3 {
             PieceY = 4;
             CurrentPieceRotation = 0;
         }
-        public static void ClearLines() {
+        public static int ClearLines() {
             int linesCleared = 0;
             for (int y = 0; y < Size.Y; y++) {
                 bool lineCleared = true;
@@ -243,6 +245,7 @@ namespace TGM3 {
             if (linesCleared == 2) AddLevels(2, true);
             if (linesCleared == 3) AddLevels(4, true);
             if (linesCleared == 4) AddLevels(6, true);
+            return linesCleared;
         }
         public static void LockPiece() {
             for (int y = 0; y < 4; y++) {
@@ -253,8 +256,11 @@ namespace TGM3 {
                 }
             }
             AddLevels(1);
-            ClearLines();
-            NewPiece(); // temp? idk xd
+            int linesCleared = ClearLines();
+            if (linesCleared > 0)
+                RemainingLockDelayFrames = LineAreFrames;
+            else
+                RemainingLockDelayFrames = AreFrames;
         }
         public static void AddLevels(int levels, bool lineClear = false) {
             int previousLevels = Level;
@@ -354,44 +360,50 @@ namespace TGM3 {
             }
         }
         public static void Update() {
-            UpdateSpeedLevel(0); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
-            #region Rotation input
-            // CCW rotation
-            if (Input.WasKeyJustDown(Keys.X))
-                TryKickMove(0, 0, 1);
-            // CW rotation
-            if (Input.WasKeyJustDown(Keys.Z))
-                TryKickMove(0, 0, -1);
-            #endregion
-            #region Soft/Hard drop
-            // Soft drop
-            if (Input.keyboard.IsKeyDown(Keys.Down))
-                Buildup += 65536; // 1G
-            // Hard drop
-            if (Input.WasKeyJustDown(Keys.Up)) {
-                while (TryMove(0, 1, 0))
-                    continue;
-                LockPiece();
+            UpdateSpeedLevel(Level); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
+            if (!IsDelayed) {
+                // CCW rotation
+                if (Input.WasKeyJustDown(Keys.X))
+                    TryKickMove(0, 0, 1);
+                // CW rotation
+                if (Input.WasKeyJustDown(Keys.Z))
+                    TryKickMove(0, 0, -1);
+                // Soft drop
+                if (Input.keyboard.IsKeyDown(Keys.Down))
+                    Buildup += 65536; // 1G
+                // Hard drop
+                if (Input.WasKeyJustDown(Keys.Up)) {
+                    while (TryMove(0, 1, 0))
+                        continue;
+                    LockPiece();
+                }
+                // Hold
+                if (Input.WasKeyJustDown(Keys.Space)) 
+                    HoldPiece();
+                if (Input.WasKeyJustDown(Keys.Left))
+                    if (CanMove(-1, 0, 0))
+                        PieceX--;
+                if (Input.WasKeyJustDown(Keys.Right))
+                    if (CanMove(1, 0, 0))
+                        PieceX++;
+                #region Gravity
+                        // Gravity
+                        Buildup += Gravity;
+                while (Buildup >= 65536) {
+                    Buildup -= 65536;
+                    if (CanMove(0, 1, 0))
+                        PieceY++;
+                }
+                #endregion
             }
-            // Hold
-            if (Input.WasKeyJustDown(Keys.Space)) {
-                HoldPiece();
-            }
-            #endregion
-            #region Movement
             // Basic left
             if (Input.WasKeyJustDown(Keys.Left)) {
                 CurrentDirection = -1;
-                if (CanMove(-1, 0, 0))
-                    PieceX--;
                 CurrentDas = 0;
             }
-
             // Basic right
             if (Input.WasKeyJustDown(Keys.Right)) {
                 CurrentDirection = 1;
-                if (CanMove(1, 0, 0))
-                    PieceX++;
                 CurrentDas = 0;
             }
             // Release -> reset DAS
@@ -400,7 +412,7 @@ namespace TGM3 {
                 CurrentDas = 0;
             }
             if (CurrentDirection != 0) {
-                if (CurrentDas >= DasFrames) {
+                if (CurrentDas >= DasFrames && !IsDelayed) {
                     if (ArrFrames == 0) {
                         while (CanMove(CurrentDirection, 0, 0))
                             PieceX += CurrentDirection;
@@ -414,18 +426,14 @@ namespace TGM3 {
                 }
                 CurrentDas++;
             }
-            #endregion
-            #region Gravity
-            // Gravity
-            Buildup += Gravity;
-            while (Buildup >= 65536) {
-                Buildup -= 65536;
-                if (CanMove(0, 1, 0))
-                    PieceY++;
-            }
-            #endregion
+
             SectionCoolFrames++;
             SectionRegretFrames++;
+            #region ARE
+            if (RemainingLockDelayFrames == 1)
+                NewPiece();
+            RemainingLockDelayFrames--;
+            #endregion
         }
         public static void UpdateSpeedLevel(int speedLevel) {
             SpeedLevel = speedLevel;
