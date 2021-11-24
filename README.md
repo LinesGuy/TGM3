@@ -62,7 +62,7 @@ More advanced Tetris stuff:
 
 [X] ARR (Auto Repeat Rate)
 
-[ ] ARE (Entry delay)
+[~] ARE (Entry delay, implemented but untested, may be buggy)
 
 [ ] Line ARE (Entry delay after clearing a line)
 
