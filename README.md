@@ -56,15 +56,15 @@ More advanced Tetris stuff:
 
 [ ] [Infinity](https://tetris.fandom.com/wiki/Infinity)
 
-[ ] IHS (Initial Hold System)
+[X] IHS (Initial Hold System)
 
-[ ] IRS (Initial Rotation System)
+[X] IRS (Initial Rotation System)
 
 [X] ARR (Auto Repeat Rate)
 
-[~] ARE (Entry delay, implemented but untested, may be buggy)
+[X] ARE (Entry delay)
 
-[ ] Line ARE (Entry delay after clearing a line)
+[X] Line ARE (Entry delay after clearing a line)
 
 [X] DAS (Delayed auto shift)
 

@@ -215,6 +215,17 @@ namespace TGM3 {
             PieceX = 3;
             PieceY = 4;
             CurrentPieceRotation = 0;
+            // IHS
+            if (Input.keyboard.IsKeyDown(Keys.Space))
+                HoldPiece();
+            // IRS
+            if (Input.keyboard.IsKeyDown(Keys.Z))
+                CurrentPieceRotation = 3;
+            if (Input.keyboard.IsKeyDown(Keys.X))
+                CurrentPieceRotation = 1;
+            // DAS charging
+            if (Input.keyboard.IsKeyDown(Keys.Left) || Input.keyboard.IsKeyDown(Keys.Right))
+                CurrentDas = DasFrames;
         }
         public static int ClearLines() {
             int linesCleared = 0;
@@ -537,8 +548,11 @@ namespace TGM3 {
                     }
                 }
             }
-            // Draw piece
-            DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
+            // Draw held piece (if any)
+            if (HeldPiece != -1) {
+                Vector2 HeldPieceOffset = new Vector2(30, 100);
+                DrawPiece(spriteBatch, HeldPieceOffset, HeldPiece, 0);
+            }
             // Draw next pieces (if any)
             if (NumNextPiecesVisible > 0) {
                 Vector2 NextPiecesOffset = Pos + new Vector2(48, -16);
@@ -549,16 +563,16 @@ namespace TGM3 {
                     DrawPiece(spriteBatch, NextPiecesOffset + new Vector2(32 + i * 48, 16), NextPieces.ToArray()[i], 0, drawScale: 0.5f);
                 }
             }
-            // Draw held piece (if any)
-            if (HeldPiece != -1) {
-                Vector2 HeldPieceOffset = new Vector2(30, 100);
-                DrawPiece(spriteBatch, HeldPieceOffset, HeldPiece, 0);
+            if (!IsDelayed) {
+                // Draw piece
+                DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
+                
+                // Draw ghost piece
+                int ghostOffsetY = 0;
+                while (CanMove(0, ghostOffsetY + 1, 0))
+                    ghostOffsetY++;
+                DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + (PieceY + ghostOffsetY) * 16), CurrentPieceType, CurrentPieceRotation, 0.5f);
             }
-            // Draw ghost piece
-            int ghostOffsetY = 0;
-            while (CanMove(0, ghostOffsetY + 1, 0))
-                ghostOffsetY++;
-            DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + (PieceY + ghostOffsetY) * 16), CurrentPieceType, CurrentPieceRotation, 0.5f);
         }
         public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f, float drawScale=1f) {
             for (int y = 0; y < 4; y++) {
