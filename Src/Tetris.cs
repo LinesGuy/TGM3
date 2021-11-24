@@ -43,7 +43,7 @@ namespace TGM3 {
             foreach (int piece in PiecesToAdd)
                 NextPieces.Enqueue(piece);
         }
-        public static bool IsDelayed { get { return RemainingLockDelayFrames > 0; } } 
+        public static bool IsDelayed { get { return RemainingLockDelayFrames > 0; } }
         public static void Initialize() {
             Grid = new int[(int)Size.Y, (int)Size.X];
             CurrentDirection = 0;
@@ -161,6 +161,31 @@ namespace TGM3 {
                     if (TryMove(2, 0, deltaRot)) return true;
                     if (TryMove(-1, -2, deltaRot)) return true;
                     if (TryMove(2, 1, deltaRot)) return true;
+                    // Next four are 180 degree rotations
+                } else if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 2) { // 0>>2
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                    if (TryMove(2, 0, deltaRot)) return true;
+                    if (TryMove(1, 0, deltaRot)) return true;
+                    if (TryMove(2, 0, deltaRot)) return true;
+                    if (TryMove(0, 1, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 1 && CurrentPieceRotation + deltaRot == 3) { // 1>>3
+                    if (TryMove(0, 1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(0, -1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 0) { // 2>>0
+                    if (TryMove(1, 0, deltaRot)) return true;
+                    if (TryMove(2, 0, deltaRot)) return true;
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                    if (TryMove(-2, 0, deltaRot)) return true;
+                    if (TryMove(0, -1, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 1) { // 3>>1
+                    if (TryMove(0, 1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(0, -1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(1, 0, deltaRot)) return true;
                 }
             } else { // J, L, T, S, Z Tetromino Wall Kick Data
                 if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 1) { // 0>>1
@@ -203,8 +228,56 @@ namespace TGM3 {
                     if (TryMove(1, -1, deltaRot)) return true;
                     if (TryMove(0, 2, deltaRot)) return true;
                     if (TryMove(1, 2, deltaRot)) return true;
+                    // Next four are 180 degree rotations
+                } else if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 2) { // 0>>2
+                    if (TryMove(1, 0, deltaRot)) return true;
+                    if (TryMove(2, 0, deltaRot)) return true;
+                    if (TryMove(1, 1, deltaRot)) return true;
+                    if (TryMove(2, 1, deltaRot)) return true;
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                    if (TryMove(-2, 0, deltaRot)) return true;
+                    if (TryMove(-1, 1, deltaRot)) return true;
+                    if (TryMove(-2, 1, deltaRot)) return true;
+                    if (TryMove(0, -1, deltaRot)) return true;
+                    if (TryMove(3, 0, deltaRot)) return true;
+                    if (TryMove(-3, 0, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 1 && CurrentPieceRotation + deltaRot == 3) { // 1>>3
+                    if (TryMove(0, 1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(-1, 1, deltaRot)) return true;
+                    if (TryMove(-1, 2, deltaRot)) return true;
+                    if (TryMove(0, -1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(-1, -1, deltaRot)) return true;
+                    if (TryMove(-1, -2, deltaRot)) return true;
+                    if (TryMove(1, 0, deltaRot)) return true;
+                    if (TryMove(0, 3, deltaRot)) return true;
+                    if (TryMove(0, -3, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 2 && CurrentPieceRotation + deltaRot == 0) { // 2>>0
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                    if (TryMove(-2, 0, deltaRot)) return true;
+                    if (TryMove(-1, -1, deltaRot)) return true;
+                    if (TryMove(-2, -1, deltaRot)) return true;
+                    if (TryMove(1, 0, deltaRot)) return true;
+                    if (TryMove(2, 0, deltaRot)) return true;
+                    if (TryMove(1, -1, deltaRot)) return true;
+                    if (TryMove(2, -1, deltaRot)) return true;
+                    if (TryMove(0, 1, deltaRot)) return true;
+                    if (TryMove(-3, 0, deltaRot)) return true;
+                    if (TryMove(3, 0, deltaRot)) return true;
+                } else if (CurrentPieceRotation == 3 && CurrentPieceRotation + deltaRot == 1) { // 3>>1
+                    if (TryMove(0, 1, deltaRot)) return true;
+                    if (TryMove(0, 2, deltaRot)) return true;
+                    if (TryMove(1, 1, deltaRot)) return true;
+                    if (TryMove(1, 2, deltaRot)) return true;
+                    if (TryMove(0, -1, deltaRot)) return true;
+                    if (TryMove(0, -2, deltaRot)) return true;
+                    if (TryMove(1, -1, deltaRot)) return true;
+                    if (TryMove(1, -2, deltaRot)) return true;
+                    if (TryMove(-1, 0, deltaRot)) return true;
+                    if (TryMove(0, 3, deltaRot)) return true;
+                    if (TryMove(0, -3, deltaRot)) return true;
                 }
-                // TODO 180 degree kick code?
             }
             return false;
         }
@@ -223,6 +296,8 @@ namespace TGM3 {
                 CurrentPieceRotation = 3;
             if (Input.keyboard.IsKeyDown(Keys.X))
                 CurrentPieceRotation = 1;
+            if (Input.keyboard.IsKeyDown(Keys.C))
+                CurrentPieceRotation = 2;
             // DAS charging
             if (Input.keyboard.IsKeyDown(Keys.Left) || Input.keyboard.IsKeyDown(Keys.Right))
                 CurrentDas = DasFrames;
@@ -379,6 +454,9 @@ namespace TGM3 {
                 // CW rotation
                 if (Input.WasKeyJustDown(Keys.Z))
                     TryKickMove(0, 0, -1);
+                // 180 rotation
+                if (Input.WasKeyJustDown(Keys.C))
+                    TryKickMove(0, 0, 2);
                 // Soft drop
                 if (Input.keyboard.IsKeyDown(Keys.Down))
                     Buildup += 65536; // 1G
@@ -389,7 +467,7 @@ namespace TGM3 {
                     LockPiece();
                 }
                 // Hold
-                if (Input.WasKeyJustDown(Keys.Space)) 
+                if (Input.WasKeyJustDown(Keys.Space))
                     HoldPiece();
                 if (Input.WasKeyJustDown(Keys.Left))
                     if (CanMove(-1, 0, 0))
@@ -398,8 +476,8 @@ namespace TGM3 {
                     if (CanMove(1, 0, 0))
                         PieceX++;
                 #region Gravity
-                        // Gravity
-                        Buildup += Gravity;
+                // Gravity
+                Buildup += Gravity;
                 while (Buildup >= 65536) {
                     Buildup -= 65536;
                     if (CanMove(0, 1, 0))
@@ -441,7 +519,7 @@ namespace TGM3 {
             SectionCoolFrames++;
             SectionRegretFrames++;
             #region ARE
-            if (RemainingLockDelayFrames == 1)
+            if (RemainingLockDelayFrames == 0)
                 NewPiece();
             RemainingLockDelayFrames--;
             #endregion
@@ -456,28 +534,28 @@ namespace TGM3 {
             else if (SpeedLevel >= 360) Gravity = 262144; // 4G
             else if (SpeedLevel >= 330) Gravity = 196608; // 3G
             else if (SpeedLevel >= 300) Gravity = 131072; // 2G
-            else if (SpeedLevel >= 251) Gravity = 65536; // 1G
-            else if (SpeedLevel >= 247) Gravity = 57344;
-            else if (SpeedLevel >= 243) Gravity = 49152;
-            else if (SpeedLevel >= 239) Gravity = 40960;
-            else if (SpeedLevel >= 236) Gravity = 32768;
-            else if (SpeedLevel >= 233) Gravity = 24576;
-            else if (SpeedLevel >= 230) Gravity = 16384;
-            else if (SpeedLevel >= 220) Gravity = 8192;
-            else if (SpeedLevel >= 200) Gravity = 1024;
-            else if (SpeedLevel >= 170) Gravity = 36864;
-            else if (SpeedLevel >= 160) Gravity = 32768;
-            else if (SpeedLevel >= 140) Gravity = 28672;
-            else if (SpeedLevel >= 120) Gravity = 24576;
-            else if (SpeedLevel >= 100) Gravity = 20480;
-            else if (SpeedLevel >= 90) Gravity = 16384;
-            else if (SpeedLevel >= 80) Gravity = 12288;
-            else if (SpeedLevel >= 70) Gravity = 8192;
-            else if (SpeedLevel >= 60) Gravity = 4096;
-            else if (SpeedLevel >= 50) Gravity = 3072;
-            else if (SpeedLevel >= 40) Gravity = 2560;
-            else if (SpeedLevel >= 35) Gravity = 2048;
-            else if (SpeedLevel >= 30) Gravity = 1536;
+            else if (SpeedLevel >= 251) Gravity = 065536; // 1G
+            else if (SpeedLevel >= 247) Gravity = 057344;
+            else if (SpeedLevel >= 243) Gravity = 049152;
+            else if (SpeedLevel >= 239) Gravity = 040960;
+            else if (SpeedLevel >= 236) Gravity = 032768;
+            else if (SpeedLevel >= 233) Gravity = 024576;
+            else if (SpeedLevel >= 230) Gravity = 016384;
+            else if (SpeedLevel >= 220) Gravity = 008192;
+            else if (SpeedLevel >= 200) Gravity = 001024;
+            else if (SpeedLevel >= 170) Gravity = 036864;
+            else if (SpeedLevel >= 160) Gravity = 032768;
+            else if (SpeedLevel >= 140) Gravity = 028672;
+            else if (SpeedLevel >= 120) Gravity = 024576;
+            else if (SpeedLevel >= 100) Gravity = 020480;
+            else if (SpeedLevel >= 090) Gravity = 016384;
+            else if (SpeedLevel >= 080) Gravity = 012288;
+            else if (SpeedLevel >= 070) Gravity = 008192;
+            else if (SpeedLevel >= 060) Gravity = 004096;
+            else if (SpeedLevel >= 050) Gravity = 003072;
+            else if (SpeedLevel >= 040) Gravity = 002560;
+            else if (SpeedLevel >= 035) Gravity = 002048;
+            else if (SpeedLevel >= 030) Gravity = 001536;
             else Gravity = 1024; // if (SpeedLevel >= 0)
 
             if (speedLevel >= 1200) {
@@ -566,7 +644,7 @@ namespace TGM3 {
             if (!IsDelayed) {
                 // Draw piece
                 DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
-                
+
                 // Draw ghost piece
                 int ghostOffsetY = 0;
                 while (CanMove(0, ghostOffsetY + 1, 0))
@@ -574,7 +652,7 @@ namespace TGM3 {
                 DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + (PieceY + ghostOffsetY) * 16), CurrentPieceType, CurrentPieceRotation, 0.5f);
             }
         }
-        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f, float drawScale=1f) {
+        public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f, float drawScale = 1f) {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (PieceData.data[type, rotation][y * 4 + x] == '1')
