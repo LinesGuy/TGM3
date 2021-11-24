@@ -78,7 +78,9 @@ More advanced Tetris stuff:
 
 [ ] 20G SRS exceptions (scroll down to 20G section in SRS page on tetris wiki)
 
+[ ] Synchro move support
 
+[ ] Zangi move support
 
 General TGM3 specific stuff:
 
