@@ -289,8 +289,12 @@ namespace TGM3 {
             PieceY = 3;
             CurrentPieceRotation = 0;
             // IHS
-            if (Input.keyboard.IsKeyDown(Keys.Space))
+            if (Input.keyboard.IsKeyDown(Keys.Space)) {
+                if (HeldPiece == -1)
+                    HoldPiece(); // exception for when player does IHS for the first hold
                 HoldPiece();
+            }
+                
             // IRS
             if (Input.keyboard.IsKeyDown(Keys.Z))
                 CurrentPieceRotation = 3;
@@ -450,6 +454,11 @@ namespace TGM3 {
         }
         public static void Update() {
             UpdateSpeedLevel(Level); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
+            #region ARE
+            if (RemainingLockDelayFrames == 0)
+                NewPiece();
+            RemainingLockDelayFrames--;
+            #endregion
             if (!IsDelayed) {
                 // CCW rotation
                 if (Input.WasKeyJustDown(Keys.X))
@@ -521,11 +530,7 @@ namespace TGM3 {
 
             SectionCoolFrames++;
             SectionRegretFrames++;
-            #region ARE
-            if (RemainingLockDelayFrames == 0)
-                NewPiece();
-            RemainingLockDelayFrames--;
-            #endregion
+            
         }
         public static void UpdateSpeedLevel(int speedLevel) {
             SpeedLevel = speedLevel;
