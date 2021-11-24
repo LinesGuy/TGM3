@@ -18,7 +18,7 @@ Basics:
 
 [X] CW / CCW rotation
 
-[ ] 180 degree rotation
+[X] 180 degree rotation
 
 [X] Hold piece
 
@@ -34,7 +34,7 @@ Basics:
 
 [X] Line clear detection and clearing
 
-[ ] Game over detection
+[X] Game over detection
 
 
 

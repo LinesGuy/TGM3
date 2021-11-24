@@ -286,7 +286,7 @@ namespace TGM3 {
             if (NextPieces.Count <= NumNextPiecesVisible)
                 AddPiecesToQueue();
             PieceX = 3;
-            PieceY = 4;
+            PieceY = 3;
             CurrentPieceRotation = 0;
             // IHS
             if (Input.keyboard.IsKeyDown(Keys.Space))
@@ -298,6 +298,9 @@ namespace TGM3 {
                 CurrentPieceRotation = 1;
             if (Input.keyboard.IsKeyDown(Keys.C))
                 CurrentPieceRotation = 2;
+            // Check if player is ded
+            if (!CanMove(0, 0, 0))
+                Initialize(); // Player is dead, just restart game for now
             // DAS charging
             if (Input.keyboard.IsKeyDown(Keys.Left) || Input.keyboard.IsKeyDown(Keys.Right))
                 CurrentDas = DasFrames;
