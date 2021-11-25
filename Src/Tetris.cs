@@ -37,6 +37,50 @@ namespace TGM3 {
         public static int SectionRegretFrames;
         public static int RemainingLockDelayFrames;
         private static readonly Random rand = new Random();
+        public static string[,] PieceData = new string[7, 4] {
+            {
+                "0000111100000000",
+                "0010001000100010",
+                "0000000011110000",
+                "0100010001000100"
+            },
+            {
+                "1000111000000000",
+                "0110010001000000",
+                "0000111000100000",
+                "0100010011000000"
+            },
+            {
+                "0010111000000000",
+                "0100010001100000",
+                "0000111010000000",
+                "1100010001000000"
+            },
+            {
+                "0110011000000000",
+                "0110011000000000",
+                "0110011000000000",
+                "0110011000000000"
+            },
+            {
+                "0110110000000000",
+                "0100011000100000",
+                "0000011011000000",
+                "1000110001000000"
+            },
+            {
+                "0100111000000000",
+                "0100011001000000",
+                "0000111001000000",
+                "0100110001000000"
+            },
+            {
+                "1100011000000000",
+                "0010011001000000",
+                "0000110001100000",
+                "0100110010000000"
+            }
+        };
         public static void AddPiecesToQueue() {
             int[] PiecesToAdd = new int[7] { 0, 1, 2, 3, 4, 5, 6 };
             PiecesToAdd = PiecesToAdd.OrderBy(p => rand.Next()).ToArray(); // Shuffle order
@@ -81,11 +125,11 @@ namespace TGM3 {
             }
         }
         public static bool CanMove(int deltaX, int deltaY, int deltaRot) {
-            deltaRot = Utils.ClampRotation(CurrentPieceRotation, deltaRot);
+            deltaRot = ClampRotation(CurrentPieceRotation, deltaRot);
             bool valid = true;
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
-                    if (PieceData.data[CurrentPieceType, CurrentPieceRotation + deltaRot][y * 4 + x] == '0')
+                    if (PieceData[CurrentPieceType, CurrentPieceRotation + deltaRot][y * 4 + x] == '0')
                         continue;
                     int tx = PieceX + x + deltaX;
                     int ty = PieceY + y + deltaY;
@@ -102,7 +146,7 @@ namespace TGM3 {
             return valid;
         }
         public static bool TryMove(int deltaX, int deltaY, int deltaRot) {
-            deltaRot = Utils.ClampRotation(CurrentPieceRotation, deltaRot);
+            deltaRot = ClampRotation(CurrentPieceRotation, deltaRot);
             if (CanMove(deltaX, deltaY, deltaRot)) {
                 PieceX += deltaX;
                 PieceY += deltaY;
@@ -113,7 +157,7 @@ namespace TGM3 {
         }
         public static bool TryKickMove(int deltaX, int deltaY, int deltaRot) {
             // Attempts to rotate the current piece, taking kicks into account
-            deltaRot = Utils.ClampRotation(CurrentPieceRotation, deltaRot);
+            deltaRot = ClampRotation(CurrentPieceRotation, deltaRot);
 
             if (TryMove(deltaX, deltaY, deltaRot)) return true; // Try basic movement + rotation
 
@@ -343,7 +387,7 @@ namespace TGM3 {
         public static void LockPiece() {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
-                    if (PieceData.data[CurrentPieceType, CurrentPieceRotation][y * 4 + x] == '0')
+                    if (PieceData[CurrentPieceType, CurrentPieceRotation][y * 4 + x] == '0')
                         continue;
                     Grid[PieceY + y, PieceX + x] = CurrentPieceType + 1;
                 }
@@ -663,11 +707,19 @@ namespace TGM3 {
         public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f, float drawScale = 1f) {
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
-                    if (PieceData.data[type, rotation][y * 4 + x] == '1')
+                    if (PieceData[type, rotation][y * 4 + x] == '1')
                         //spriteBatch.Draw(GetTextureFromPiece(type), new Rectangle((int)pos.X + x * 16, (int)pos.Y + y * 16, 16, 16), Color.White * alpha);
                         spriteBatch.Draw(GetTextureFromPiece(type), new Vector2(pos.X + x * 16 * drawScale, pos.Y + y * 16 * drawScale), null, Color.White * alpha, 0f, Vector2.Zero, drawScale, 0, 0);
                 }
             }
+        }
+        public static int ClampRotation(int currentPieceRotation, int deltaRotation) {
+            if (currentPieceRotation + deltaRotation >= 4)
+                return deltaRotation - 4;
+            else if (currentPieceRotation + deltaRotation < 0)
+                return deltaRotation + 4;
+            else
+                return deltaRotation;
         }
         public static Texture2D GetTextureFromPiece(int piece) {
             if (piece == 0) return Art.BlockI;
