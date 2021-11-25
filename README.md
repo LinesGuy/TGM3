@@ -24,7 +24,7 @@ Basics:
 
 [X] Next piece previews
 
-[~] Standard piece colours (SRS done, ARS not done)
+[X] Standard piece colours (SRS done, ARS not done)
 
 [~] Gravity (Done except piece will not auto lock when it hits the ground)
 

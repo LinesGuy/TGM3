@@ -12,6 +12,7 @@ namespace TGM3 {
         public static Vector2 Size = new Vector2(10, 24);
         public static int visibleRows = 20;
         public static int[,] Grid = new int[(int)Size.Y, (int)Size.X];
+        public static string RotationSystem;
         public static int PieceX = 0, PieceY = 0;
         public static int Buildup = 0;
         public static int Gravity = 1024;
@@ -89,6 +90,7 @@ namespace TGM3 {
         }
         public static bool IsDelayed { get { return RemainingLockDelayFrames > 0; } }
         public static void Initialize() {
+            RotationSystem = "ARS";
             Grid = new int[(int)Size.Y, (int)Size.X];
             CurrentDirection = 0;
             ArrFrames = 1;
@@ -722,14 +724,27 @@ namespace TGM3 {
                 return deltaRotation;
         }
         public static Texture2D GetTextureFromPiece(int piece) {
-            if (piece == 0) return Art.BlockI;
-            if (piece == 1) return Art.BlockJ;
-            if (piece == 2) return Art.BlockL;
-            if (piece == 3) return Art.BlockO;
-            if (piece == 4) return Art.BlockS;
-            if (piece == 5) return Art.BlockT;
-            if (piece == 6) return Art.BlockZ;
-            else return Art.Block;
+            if (RotationSystem == "SRS") {
+                if (piece == 0) return Art.BlockwI;
+                if (piece == 1) return Art.BlockwJ;
+                if (piece == 2) return Art.BlockwL;
+                if (piece == 3) return Art.BlockwO;
+                if (piece == 4) return Art.BlockwS;
+                if (piece == 5) return Art.BlockwT;
+                if (piece == 6) return Art.BlockwZ;
+                else return Art.Blockw;
+            } else if (RotationSystem == "ARS") {
+                if (piece == 0) return Art.BlockI;
+                if (piece == 1) return Art.BlockJ;
+                if (piece == 2) return Art.BlockL;
+                if (piece == 3) return Art.BlockO;
+                if (piece == 4) return Art.BlockS;
+                if (piece == 5) return Art.BlockT;
+                if (piece == 6) return Art.BlockZ;
+                else return Art.Block;
+            } else {
+                return Art.Block;
+            }
         }
     }
 }
