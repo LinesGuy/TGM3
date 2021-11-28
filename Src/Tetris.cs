@@ -220,9 +220,9 @@ namespace TGM3 {
 
             if (TryMove(deltaX, deltaY, deltaRot)) return true; // Try basic movement + rotation
 
-            // ARS KICK
+            // ARS KICK https://harddrop.com/wiki/ARS
             if (RotationSystem == "ARS") {
-                if (CurrentPieceType == 0) return false; // "The I tetromino will never kick."
+                //if (CurrentPieceType == 0) return false; // "The I tetromino will never kick."
                 int tx = PieceX + deltaX;
                 int ty = PieceY + deltaY;
                 // J, L, T exceptions
@@ -247,9 +247,24 @@ namespace TGM3 {
                     if (CurrentPieceRotation == 0 || CurrentPieceRotation == 2) {
                         if (Grid[ty + 1, tx] != 0) return false;
                     }
+                    if (CurrentPieceRotation + deltaRot == 2) {
+                        // TODO there is some crazy black magic stuff that determines whether or not the T piece can kick in this situation
+                        // what i did here is just kick it up by one and call it a day
+                        if (TryMove(0, -1, deltaRot)) return true;
+                    }
                 }
                 if (TryMove(1, 0, deltaRot)) return true; // "1 space right of basic rotation"
                 if (TryMove(-1, 0, deltaRot)) return true; // "1 space left of basic rotation"
+                if (CurrentPieceType == 0) {
+                    if (CurrentPieceRotation + deltaRot == 0 || CurrentPieceRotation + deltaRot == 1) { // Vertical to horizontal
+                        if (TryMove(2, 0, deltaRot)) return true; // Special exception for I piece kicking right twice
+                    } else { // Horizontal to vertical
+                        if (TryMove(0, -1, deltaRot)) return true; // Special exception for I piece kicking up
+                        if (TryMove(0, -2, deltaRot)) return true; // Kick up twice
+                        // TODO? I piece should not be able to kick if in "midair" but this should never happen
+                    }
+                }
+                // TODO "Mihara's conspiracy ?????
                 return false;
             }
 
