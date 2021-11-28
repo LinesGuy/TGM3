@@ -39,6 +39,7 @@ Basics:
 
 
 More advanced Tetris stuff:
+[ ] Don't allow player to hold piece twice
 
 [X] Ghost piece
 
@@ -48,11 +49,11 @@ More advanced Tetris stuff:
 
 [X] SRS rotation
 
-[ ] ARS spawn location and orientation
+[X] ARS spawn location and orientation
 
-[ ] ARS Wall/floor kicks
+[X] ARS Wall kicks
 
-[ ] ARS rotation
+[X] ARS rotation
 
 [ ] [Infinity](https://tetris.fandom.com/wiki/Infinity)
 
