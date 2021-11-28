@@ -37,6 +37,8 @@ namespace TGM3 {
         public static int SectionCoolFrames;
         public static int SectionRegretFrames;
         public static int RemainingLockDelayFrames;
+        public static string MessageText;
+        public static int MessageRemainingFrames;
         private static readonly Random rand = new Random();
         public static string[,] PieceData;
         public static void AddPiecesToQueue() {
@@ -51,7 +53,6 @@ namespace TGM3 {
             foreach (int piece in PiecesToAdd)
                 NextPieces.Enqueue(piece);
         }
-        public static bool IsDelayed { get { return RemainingLockDelayFrames > 0; } }
         public static void LoadRotationSystem(string system) {
             if (system == "SRS") {
                 RotationSystem = "SRS";
@@ -148,7 +149,7 @@ namespace TGM3 {
             }
         }
         public static void Initialize() {
-            LoadRotationSystem("ARS");
+            LoadRotationSystem("SRS");
             Grid = new int[(int)Size.Y, (int)Size.X];
             CurrentDirection = 0;
             ArrFrames = 1;
@@ -169,6 +170,8 @@ namespace TGM3 {
             SectionCoolFrames = 0;
             SectionRegretFrames = 0;
             CanHoldPiece = true;
+            MessageText = "";
+            MessageRemainingFrames = 0;
         }
         public static void HoldPiece() {
             if (HeldPiece == -1) {
@@ -509,7 +512,7 @@ namespace TGM3 {
         public static void AddLevels(int levels, bool lineClear = false) {
             int previousLevels = Level;
             Level += levels;
-            if (levels % 100 > previousLevels % 100) { // If transitioning level
+            if (levels % 100 > previousLevels % 100 && previousLevels != 0) { // If transitioning level
                 if (lineClear) {
                     // Level transition
                 } else {
@@ -517,89 +520,97 @@ namespace TGM3 {
                     Level = (int)Math.Floor(Level / 100d) * 100 - 1;
                 }
             }
-            DoSectionCools(previousLevels);
+            CheckSectionCools(previousLevels);
         }
-        public static void DoSectionCools(int previousLevels) {
+        public static void DoSectionCool() {
+            MessageText = "COOL";
+            MessageRemainingFrames = 180;
+        }
+        public static void DoSectionRegret() {
+            MessageText = "REGRET";
+            MessageRemainingFrames = 180;
+        }
+        public static void CheckSectionCools(int previousLevels) {
             // previousLevels is required so if the player jumps from, say, level 69 to level 71, the level 70 check is still called
             // Note that all section COOLs are COOLs but not all COOLs are section COOLs
             Debug.WriteLine(Level);
             Debug.WriteLine(SectionCoolFrames);
             // Section COOLs
             if (previousLevels < 70 && Level >= 70) { // 000-070
-                if (SectionCoolFrames <= 3120) { Debug.WriteLine("COOL!!"); } // 52:00
+                if (SectionCoolFrames <= 3120) { DoSectionCool(); } // 52:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 170 && Level >= 170) { // 100-170
-                if (SectionCoolFrames <= 3120) { } // 52:00
+                if (SectionCoolFrames <= 3120) { DoSectionCool(); } // 52:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 270 && Level >= 270) { // 200-270
-                if (SectionCoolFrames <= 2940) { } // 49:00
+                if (SectionCoolFrames <= 2940) { DoSectionCool(); } // 49:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 370 && Level >= 370) { // 300-370
-                if (SectionCoolFrames <= 2700) { } // 45:00
+                if (SectionCoolFrames <= 2700) { DoSectionCool(); } // 45:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 470 && Level >= 470) { // 400-470
-                if (SectionCoolFrames <= 2700) { } // 45:00
+                if (SectionCoolFrames <= 2700) { DoSectionCool(); } // 45:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 570 && Level >= 570) { // 500-570
-                if (SectionCoolFrames <= 2520) { } // 42:00
+                if (SectionCoolFrames <= 2520) { DoSectionCool(); } // 42:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 670 && Level >= 670) { // 600-670
-                if (SectionCoolFrames <= 2520) { } // 42:00
+                if (SectionCoolFrames <= 2520) { DoSectionCool(); } // 42:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 770 && Level >= 770) { // 700-770
-                if (SectionCoolFrames <= 2280) { } // 38:00
+                if (SectionCoolFrames <= 2280) { DoSectionCool(); } // 38:00
                 SectionCoolFrames = 0;
             }
             if (previousLevels < 870 && Level >= 870) { // 800-870
-                if (SectionCoolFrames <= 2280) { } // 38:00
+                if (SectionCoolFrames <= 2280) { DoSectionCool(); } // 38:00
                 SectionCoolFrames = 0;
             }
             // Section REGRETs
             if (previousLevels < 099 && Level >= 099) { // 000-099
-                if (SectionRegretFrames <= 5400) { } // 1:30:00
+                if (SectionRegretFrames <= 5400) { DoSectionRegret(); } // 1:30:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 199 && Level >= 199) { // 100-199
-                if (SectionRegretFrames <= 4500) { } // 1:15:00
+                if (SectionRegretFrames <= 4500) { DoSectionRegret(); } // 1:15:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 299 && Level >= 299) { // 200-299
-                if (SectionRegretFrames <= 4500) { } // 1:15:00
+                if (SectionRegretFrames <= 4500) { DoSectionRegret(); } // 1:15:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 399 && Level >= 399) { // 300-399
-                if (SectionRegretFrames <= 4080) { } // 1:08:00
+                if (SectionRegretFrames <= 4080) { DoSectionRegret(); } // 1:08:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 499 && Level >= 499) { // 400-499
-                if (SectionRegretFrames <= 3600) { } // 1:00:00
+                if (SectionRegretFrames <= 3600) { DoSectionRegret(); } // 1:00:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 599 && Level >= 599) { // 500-599
-                if (SectionRegretFrames <= 3600) { } // 1:00:00
+                if (SectionRegretFrames <= 3600) { DoSectionRegret(); } // 1:00:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 699 && Level >= 699) { // 600-699
-                if (SectionRegretFrames <= 3000) { } // 50:00
+                if (SectionRegretFrames <= 3000) { DoSectionRegret(); } // 50:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 799 && Level >= 799) { // 700-799
-                if (SectionRegretFrames <= 3000) { } // 50:00
+                if (SectionRegretFrames <= 3000) { DoSectionRegret(); } // 50:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 899 && Level >= 899) { // 800-899
-                if (SectionRegretFrames <= 3000) { } // 50:00
+                if (SectionRegretFrames <= 3000) { DoSectionRegret(); } // 50:00
                 SectionRegretFrames = 0;
             }
             if (previousLevels < 899 && Level >= 899) { // 900-999
-                if (SectionRegretFrames <= 3000) { } // 50:00
+                if (SectionRegretFrames <= 3000) { DoSectionRegret(); } // 50:00
                 SectionRegretFrames = 0;
             }
         }
@@ -610,7 +621,7 @@ namespace TGM3 {
                 NewPiece();
             RemainingLockDelayFrames--;
             #endregion
-            if (!IsDelayed) {
+            if (RemainingLockDelayFrames <= 0) {
                 // CCW rotation
                 if (Input.WasKeyJustDown(Keys.X))
                     TryKickMove(0, 0, 1);
@@ -664,7 +675,7 @@ namespace TGM3 {
                 CurrentDas = 0;
             }
             if (CurrentDirection != 0) {
-                if (CurrentDas >= DasFrames && !IsDelayed) {
+                if (CurrentDas >= DasFrames && RemainingLockDelayFrames <= 0) {
                     if (ArrFrames == 0) {
                         while (CanMove(CurrentDirection, 0, 0))
                             PieceX += CurrentDirection;
@@ -800,7 +811,7 @@ namespace TGM3 {
                     DrawPiece(spriteBatch, NextPiecesOffset + new Vector2(32 + i * 48, 16), NextPieces.ToArray()[i], 0, drawScale: 0.5f);
                 }
             }
-            if (!IsDelayed) {
+            if (RemainingLockDelayFrames <= 0) {
                 // Draw piece
                 DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
 
@@ -810,6 +821,21 @@ namespace TGM3 {
                     ghostOffsetY++;
                 DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + (PieceY + ghostOffsetY) * 16), CurrentPieceType, CurrentPieceRotation, 0.5f);
             }
+            // Draw message
+            if (MessageRemainingFrames > 0) {
+                Texture2D img = Art.MsgCool;
+                if (MessageText == "REGRET")
+                    img = Art.MsgRegret;
+                Color color = Color.White;
+                if (MessageRemainingFrames % 6 <= 2)
+                    color = Color.Yellow;
+                spriteBatch.Draw(img, Pos + new Vector2(Size.X * 8f, Size.Y * 16f + 64), null, color, 0f, new Vector2(img.Width / 2f, img.Height / 2f), 1f, 0, 0);
+                MessageRemainingFrames--;
+            }
+            // Draw current level
+            Art.DrawText(spriteBatch, Level.ToString(), new Vector2(300, 300));
+            // Draw current section cool frames
+            Art.DrawText(spriteBatch, SectionCoolFrames.ToString(), new Vector2(300, 400));
         }
         public static void DrawPiece(SpriteBatch spriteBatch, Vector2 pos, int type, int rotation = 0, float alpha = 1f, float drawScale = 1f) {
             for (int y = 0; y < 4; y++) {
