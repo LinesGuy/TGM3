@@ -29,7 +29,7 @@ namespace TGM3 {
         public static int LockFrames;
         public static int LineClearFrames;
         public static int HeldPiece;
-        public static bool CanHoldPiece; // TODO can't hold piece twice in a row
+        public static bool CanHoldPiece;
         public static int SpeedLevel;
         public static int Level;
         public static Queue<int> NextPieces;
@@ -175,8 +175,11 @@ namespace TGM3 {
             MessageRemainingFrames = 0;
             CurrentPieceActive = true;
             NewPiece();
+            CanHoldPiece = true;
         }
         public static void HoldPiece() {
+            if (!CanHoldPiece) return;
+            CanHoldPiece = false;
             if (HeldPiece == -1) {
                 HeldPiece = CurrentPieceType;
                 NewPiece();
@@ -439,6 +442,7 @@ namespace TGM3 {
             return false;
         }
         public static void NewPiece() {
+            if (!CanHoldPiece) CanHoldPiece = true;
             CurrentPieceType = NextPieces.Dequeue();
             if (NextPieces.Count <= NumNextPiecesVisible)
                 AddPiecesToQueue();
@@ -498,6 +502,7 @@ namespace TGM3 {
             return linesCleared;
         }
         public static void LockPiece() {
+            CurrentPieceActive = false;
             for (int y = 0; y < 4; y++) {
                 for (int x = 0; x < 4; x++) {
                     if (PieceData[CurrentPieceType, CurrentPieceRotation][y * 4 + x] == '0')
@@ -620,10 +625,12 @@ namespace TGM3 {
         public static void Update() {
             UpdateSpeedLevel(Level); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
             #region ARE
-            RemainingLockDelayFrames--;
-            if (RemainingLockDelayFrames == 0) {
-                CurrentPieceActive = true;
-                NewPiece();
+            if (RemainingLockDelayFrames > 0) {
+                RemainingLockDelayFrames--;
+                if (RemainingLockDelayFrames == 0) {
+                    CurrentPieceActive = true;
+                    NewPiece();
+                }
             }
             #endregion
             if (CurrentPieceActive) {
