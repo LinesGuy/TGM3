@@ -29,7 +29,7 @@ namespace TGM3 {
         public static int LockFrames;
         public static int LineClearFrames;
         public static int HeldPiece;
-        public static bool CanHoldPiece;
+        public static bool CanHoldPiece; // TODO can't hold piece twice in a row
         public static int SpeedLevel;
         public static int Level;
         public static Queue<int> NextPieces;
@@ -38,59 +38,117 @@ namespace TGM3 {
         public static int SectionRegretFrames;
         public static int RemainingLockDelayFrames;
         private static readonly Random rand = new Random();
-        public static string[,] PieceData = new string[7, 4] {
-            {
-                "0000111100000000",
-                "0010001000100010",
-                "0000000011110000",
-                "0100010001000100"
-            },
-            {
-                "1000111000000000",
-                "0110010001000000",
-                "0000111000100000",
-                "0100010011000000"
-            },
-            {
-                "0010111000000000",
-                "0100010001100000",
-                "0000111010000000",
-                "1100010001000000"
-            },
-            {
-                "0110011000000000",
-                "0110011000000000",
-                "0110011000000000",
-                "0110011000000000"
-            },
-            {
-                "0110110000000000",
-                "0100011000100000",
-                "0000011011000000",
-                "1000110001000000"
-            },
-            {
-                "0100111000000000",
-                "0100011001000000",
-                "0000111001000000",
-                "0100110001000000"
-            },
-            {
-                "1100011000000000",
-                "0010011001000000",
-                "0000110001100000",
-                "0100110010000000"
-            }
-        };
+        public static string[,] PieceData;
         public static void AddPiecesToQueue() {
+            // Currently the only system in place is a bag of 7 pieces
             int[] PiecesToAdd = new int[7] { 0, 1, 2, 3, 4, 5, 6 };
             PiecesToAdd = PiecesToAdd.OrderBy(p => rand.Next()).ToArray(); // Shuffle order
+
+            if (NextPieces.Count == 0) // "The game never deals an S, Z or O as the first piece, to avoid a forced overhang
+                while (PiecesToAdd[0] == 4 || PiecesToAdd[0] == 6 || PiecesToAdd[0] == 3)
+                    PiecesToAdd = PiecesToAdd.OrderBy(p => rand.Next()).ToArray();
+
             foreach (int piece in PiecesToAdd)
                 NextPieces.Enqueue(piece);
         }
         public static bool IsDelayed { get { return RemainingLockDelayFrames > 0; } }
+        public static void LoadRotationSystem(string system) {
+            if (system == "SRS") {
+                RotationSystem = "SRS";
+                PieceData = new string[7, 4] {
+                    {
+                        "0000111100000000", // I
+                        "0010001000100010",
+                        "0000000011110000",
+                        "0100010001000100"
+                    },
+                    {
+                        "1000111000000000", // J
+                        "0110010001000000",
+                        "0000111000100000",
+                        "0100010011000000"
+                    },
+                    {
+                        "0010111000000000", // L
+                        "0100010001100000",
+                        "0000111010000000",
+                        "1100010001000000"
+                    },
+                    {
+                        "0110011000000000", // O
+                        "0110011000000000",
+                        "0110011000000000",
+                        "0110011000000000"
+                    },
+                    {
+                        "0110110000000000", // S
+                        "0100011000100000",
+                        "0000011011000000",
+                        "1000110001000000"
+                    },
+                    {
+                        "0100111000000000", // T
+                        "0100011001000000",
+                        "0000111001000000",
+                        "0100110001000000"
+                    },
+                    {
+                        "1100011000000000", // Z
+                        "0010011001000000",
+                        "0000110001100000",
+                        "0100110010000000"
+                    }
+                };
+            } else { // if system == "ARS"
+                RotationSystem = "ARS";
+                PieceData = new string[7, 4] {
+                    {
+                        "0000111100000000", // I
+                        "0010001000100010",
+                        "0000111100000000",
+                        "0010001000100010",
+                    },
+                    {
+                        "0000111000100000", // J
+                        "0100010011000000",
+                        "0000100011100000",
+                        "0110010001000000"
+                    },
+                    {
+                        "0000111010000000", // L
+                        "1100010001000000",
+                        "0000001011100000",
+                        "0100010001100000"
+                    },
+                    {
+                        "0000011001100000", // O
+                        "0000011001100000",
+                        "0000011001100000",
+                        "0000011001100000",
+                    },
+                    {
+                        "0000011011000000", // S
+                        "1000110001000000",
+                        "0000011011000000",
+                        "1000110001000000",
+                    },
+                    {
+                        "0000111001000000", // T
+                        "0100110001000000",
+                        "0000010011100000",
+                        "0100011001000000"
+                    },
+                    {
+                        "0000110001100000", // Z
+                        "0010011001000000",
+                        "0000110001100000",
+                        "0010011001000000",
+                    },
+                };
+            }
+        }
         public static void Initialize() {
-            RotationSystem = "ARS";
+            LoadRotationSystem("ARS");
             Grid = new int[(int)Size.Y, (int)Size.X];
             CurrentDirection = 0;
             ArrFrames = 1;
@@ -111,7 +169,6 @@ namespace TGM3 {
             SectionCoolFrames = 0;
             SectionRegretFrames = 0;
             CanHoldPiece = true;
-            NewPiece();
         }
         public static void HoldPiece() {
             if (HeldPiece == -1) {
@@ -163,9 +220,42 @@ namespace TGM3 {
 
             if (TryMove(deltaX, deltaY, deltaRot)) return true; // Try basic movement + rotation
 
+            // ARS KICK
+            if (RotationSystem == "ARS") {
+                if (CurrentPieceType == 0) return false; // "The I tetromino will never kick."
+                int tx = PieceX + deltaX;
+                int ty = PieceY + deltaY;
+                // J, L, T exceptions
+                if (CurrentPieceType == 1 || CurrentPieceType == 2) { // J, L
+                    if (CurrentPieceRotation == 0) {
+                        if (Grid[ty + 2, tx + 1] != 0) {
+                            if (CurrentPieceType == 1 && Grid[ty, tx] != 0)
+                                return TryMove(1, 0, deltaRot);
+                            else if (CurrentPieceType == 2 && Grid[ty, tx + 2] != 0)
+                                return TryMove(-1, 0, deltaRot);
+                            else
+                                return false;
+                        }
+                        if (Grid[ty , tx + 1] != 0) return false;
+                    }
+                    if (CurrentPieceRotation == 2) {
+                        if (Grid[ty, tx + 1] != 0) return false;
+                        if (Grid[ty + 1, tx + 1] != 0) return false;
+                    }
+                }
+                if (CurrentPieceType == 5) { // T
+                    if (CurrentPieceRotation == 0 || CurrentPieceRotation == 2) {
+                        if (Grid[ty + 1, tx] != 0) return false;
+                    }
+                }
+                if (TryMove(1, 0, deltaRot)) return true; // "1 space right of basic rotation"
+                if (TryMove(-1, 0, deltaRot)) return true; // "1 space left of basic rotation"
+                return false;
+            }
+
             // NOTE: The wall kick data on the tetris wiki uses positive Y = upwards, my program uses positive Y = downwards
             // This means all the y-offset values will be negative from the wiki
-
+            // SRS KICK DATRA
             if (CurrentPieceType == 0) { // I Tetromino Wall Kick Data
                 if (CurrentPieceRotation == 0 && CurrentPieceRotation + deltaRot == 1) { // 0>>1
                     if (TryMove(-2, 0, deltaRot)) return true;
@@ -340,7 +430,7 @@ namespace TGM3 {
                     HoldPiece(); // exception for when player does IHS for the first hold
                 HoldPiece();
             }
-                
+
             // IRS
             if (Input.keyboard.IsKeyDown(Keys.Z))
                 CurrentPieceRotation = 3;
@@ -576,7 +666,7 @@ namespace TGM3 {
 
             SectionCoolFrames++;
             SectionRegretFrames++;
-            
+
         }
         public static void UpdateSpeedLevel(int speedLevel) {
             SpeedLevel = speedLevel;
