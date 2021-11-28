@@ -39,6 +39,7 @@ namespace TGM3 {
         public static int RemainingLockDelayFrames;
         public static string MessageText;
         public static int MessageRemainingFrames;
+        public static bool CurrentPieceActive;
         private static readonly Random rand = new Random();
         public static string[,] PieceData;
         public static void AddPiecesToQueue() {
@@ -172,6 +173,8 @@ namespace TGM3 {
             CanHoldPiece = true;
             MessageText = "";
             MessageRemainingFrames = 0;
+            CurrentPieceActive = true;
+            NewPiece();
         }
         public static void HoldPiece() {
             if (HeldPiece == -1) {
@@ -617,11 +620,13 @@ namespace TGM3 {
         public static void Update() {
             UpdateSpeedLevel(Level); // Updates gravity, ARE, Line ARE, DAS, Lock, Line Clear
             #region ARE
-            if (RemainingLockDelayFrames == 0)
-                NewPiece();
             RemainingLockDelayFrames--;
+            if (RemainingLockDelayFrames == 0) {
+                CurrentPieceActive = true;
+                NewPiece();
+            }
             #endregion
-            if (RemainingLockDelayFrames <= 0) {
+            if (CurrentPieceActive) {
                 // CCW rotation
                 if (Input.WasKeyJustDown(Keys.X))
                     TryKickMove(0, 0, 1);
@@ -675,7 +680,7 @@ namespace TGM3 {
                 CurrentDas = 0;
             }
             if (CurrentDirection != 0) {
-                if (CurrentDas >= DasFrames && RemainingLockDelayFrames <= 0) {
+                if (CurrentDas >= DasFrames && CurrentPieceActive) {
                     if (ArrFrames == 0) {
                         while (CanMove(CurrentDirection, 0, 0))
                             PieceX += CurrentDirection;
@@ -811,7 +816,7 @@ namespace TGM3 {
                     DrawPiece(spriteBatch, NextPiecesOffset + new Vector2(32 + i * 48, 16), NextPieces.ToArray()[i], 0, drawScale: 0.5f);
                 }
             }
-            if (RemainingLockDelayFrames <= 0) {
+            if (CurrentPieceActive) {
                 // Draw piece
                 DrawPiece(spriteBatch, new Vector2(Pos.X + PieceX * 16, Pos.Y + PieceY * 16), CurrentPieceType, CurrentPieceRotation);
 
